@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plataforma de Inducción</title>
+  <!-- Google Fonts: Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* =========================
+       Variables CSS y Reset
+       ========================= */
+    :root {
+      --primary-blue: #4166c5;
+      --primary-blue-dark: #2d4a8f;
+      --primary-blue-light: #5a7bd4;
+      --success-green: #22c55e;
+      --success-green-dark: #16a34a;
+      --warning-yellow: #f59e0b;
+      --danger-red: #ef4444;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --border-radius: 12px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* =========================
+       Fondo mejorado con gradiente
+       ========================= */
+    body {
+      font-family: 'Montserrat', sans-serif;
+      line-height: 1.6;
+      color: var(--gray-900);
+      background: linear-gradient(135deg, rgba(65, 102, 197, 0.1) 0%, rgba(255, 255, 255, 0.9) 100%),
+                  url("https://media.presidencia.gov.co/Intranet/th/induccion/fondo.jpg") center/cover no-repeat fixed;
+      min-height: 100vh;
+    }
+
+    /* =========================
+       Utilidades
+       ========================= */
+    .hidden { display: none !important; }
+    .fade-in { 
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* =========================
+       Header mejorado
+       ========================= */
+    header {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+      padding: 1rem 2rem;
+      position: relative;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+
+    header .logo {
+      height: 180px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+    }
+
+    #logout {
+      position: absolute;
+      top: 1rem;
+      right: 2rem;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+      backdrop-filter: blur(10px);
+    }
+
+    #logout:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    /* =========================
+       Subheader mejorado
+       ========================= */
+    .subheader {
+      background: linear-gradient(135deg, #ffffff 0%, var(--gray-50) 100%);
+      text-align: center;
+      padding: 2rem 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .subheader h2 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    /* =========================
+       Barra de progreso
+       ========================= */
+    .progress-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    .progress-bar {
+      background: var(--gray-100);
+      height: 8px;
+      border-radius: 50px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--success-green) 0%, var(--success-green-dark) 100%);
+      border-radius: 50px;
+      transition: width 0.5s ease;
+      position: relative;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .progress-text {
+      text-align: center;
+      margin-top: 0.5rem;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+
+    /* =========================
+       Instrucciones mejoradas
+       ========================= */
+    .instructions {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      color: var(--gray-900);
+      border-left: 6px solid var(--warning-yellow);
+      padding: 1.5rem;
+      margin: 2rem auto;
+      max-width: 800px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .instructions::before {
+      content: '⚠️';
+      position: absolute;
+      top: 1rem;
+      left: -0.5rem;
+      font-size: 1.5rem;
+      background: var(--warning-yellow);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .instructions p {
+      margin-left: 1rem;
+      font-weight: 500;
+    }
+
+    /* =========================
+       Login mejorado
+       ========================= */
+    #login {
+      text-align: center;
+      padding: 3rem;
+      background: rgba(255, 255, 255, 0.95);
+      max-width: 450px;
+      margin: 3rem auto;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(10px);
+    }
+
+    #login h2 {
+      color: var(--primary-blue);
+      margin-bottom: 2rem;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    #login input {
+      width: 100%;
+      padding: 1rem;
+      margin: 0.75rem 0;
+      font-size: 1rem;
+      border: 2px solid var(--gray-100);
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    #login input:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 4px rgba(65, 102, 197, 0.1);
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 1.5rem;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+    }
+
+    /* =========================
+       Dashboard de estadísticas
+       ========================= */
+    .stats-dashboard {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-md);
+      text-align: center;
+      transition: var(--transition);
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .stat-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary-blue);
+      display: block;
+    }
+
+    .stat-label {
+      color: var(--gray-500);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.875rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* =========================
+       Módulos mejorados
+       ========================= */
+    #modules {
+      max-width: 1400px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 2rem;
+    }
+
+    .module {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+      position: relative;
+      backdrop-filter: blur(10px);
+    }
+
+    .module:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .module.locked {
+      opacity: 0.6;
+      transform: none !important;
+    }
+
+    .module.locked::after {
+      content: '🔒';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      z-index: 10;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* =========================
+       Banner del módulo
+       ========================= */
+    .module .banner {
+      position: relative;
+      height: 180px;
+      overflow: hidden;
+    }
+
+    .module .banner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: var(--transition);
+    }
+
+    .module:hover .banner img {
+      transform: scale(1.05);
+    }
+
+    .module .banner h3 {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: 0;
+      padding: 1rem;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+      color: white;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    /* =========================
+       Contenido del módulo
+       ========================= */
+    .module-content {
+      padding: 1.5rem;
+    }
+
+    .module video {
+      width: 100%;
+      height: 250px;
+      border-radius: calc(var(--border-radius) / 2);
+      margin-bottom: 1rem;
+      object-fit: cover;
+    }
+
+    .module.locked video {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    /* =========================
+       Preguntas mejoradas
+       ========================= */
+    .questions {
+      margin-top: 1.5rem;
+    }
+
+    .question-item {
+      background: var(--gray-50);
+      padding: 1.5rem;
+      border-radius: calc(var(--border-radius) / 2);
+      margin-bottom: 1rem;
+      border-left: 4px solid var(--primary-blue);
+    }
+
+    .question-item p {
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--gray-900);
+    }
+
+    .question-item label {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      background: white;
+      border-radius: calc(var(--border-radius) / 2);
+      cursor: pointer;
+      transition: var(--transition);
+      border: 2px solid transparent;
+    }
+
+    .question-item label:hover {
+      background: var(--primary-blue-light);
+      color: white;
+      transform: translateX(5px);
+    }
+
+    .question-item input[type="radio"] {
+      margin-right: 0.75rem;
+      transform: scale(1.2);
+    }
+
+    /* =========================
+       Botones mejorados
+       ========================= */
+    .btn-send {
+      display: none;
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--success-green) 0%, var(--success-green-dark) 100%);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-send.visible {
+      display: block;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .btn-send:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-send:disabled {
+      background: linear-gradient(135deg, var(--gray-500) 0%, var(--gray-700) 100%);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* =========================
+       Resultado mejorado
+       ========================= */
+    .module .resultado {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: calc(var(--border-radius) / 2);
+      font-weight: 600;
+      text-align: center;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .resultado.success {
+      background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+      color: var(--success-green-dark);
+      border: 2px solid var(--success-green);
+    }
+
+    .resultado.warning {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      color: #92400e;
+      border: 2px solid var(--warning-yellow);
+    }
+
+    .resultado.danger {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      color: #dc2626;
+      border: 2px solid var(--danger-red);
+    }
+
+    /* =========================
+       Certificado mejorado
+       ========================= */
+    #cert {
+      text-align: center;
+      margin: 3rem auto;
+      max-width: 600px;
+      padding: 0 2rem;
+    }
+
+    #certBtn {
+      padding: 1.5rem 3rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--success-green) 0%, var(--success-green-dark) 100%);
+      color: white;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #certBtn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    #certBtn:disabled {
+      background: linear-gradient(135deg, var(--gray-500) 0%, var(--gray-700) 100%);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #certBtn::before {
+      content: '🏆';
+      margin-right: 0.5rem;
+    }
+
+    /* =========================
+       Footer mejorado
+       ========================= */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: linear-gradient(135deg, var(--primary-blue-dark) 0%, var(--primary-blue) 100%);
+      color: white;
+      margin-top: 4rem;
+      font-weight: 500;
+    }
+
+    /* =========================
+       Responsive
+       ========================= */
+    @media (max-width: 768px) {
+      #modules {
+        grid-template-columns: 1fr;
+        padding: 0 1rem;
+      }
+      
+      .stats-dashboard {
+        grid-template-columns: 1fr;
+        padding: 0 1rem;
+      }
+      
+      #logout {
+        position: static;
+        margin-top: 1rem;
+      }
+      
+      header {
+        padding: 1rem;
+      }
+    }
+
+    /* =========================
+       Animaciones de carga
+       ========================= */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Notificaciones */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      z-index: 10000;
+      animation: slideIn 0.3s ease-out;
+      max-width: 300px;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header principal -->
+  <header>
+    <img src="https://media.presidencia.gov.co/Intranet/th/induccion/LOGO%20BLANCO.png"
+         alt="Logo Presidencia"
+         class="logo">
+    <button id="logout" class="hidden">
+      <span>👤</span> Cerrar sesión
+    </button>
+  </header>
+
+  <!-- Subheader -->
+  <div class="subheader">
+    <h2>Inducción Presidencia de la República</h2>
+  </div>
+
+  <!-- Barra de progreso -->
+  <div id="progressContainer" class="progress-container hidden">
+    <div class="progress-bar">
+      <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+    </div>
+    <div id="progressText" class="progress-text">Progreso: 0% (0/13 módulos completados)</div>
+  </div>
+
+  <!-- Dashboard de estadísticas -->
+  <div id="statsDashboard" class="stats-dashboard hidden">
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <span id="globalScore" class="stat-number">0%</span>
+      <div class="stat-label">Calificación Global</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <span id="completedModules" class="stat-number">0</span>
+      <div class="stat-label">Módulos Completados</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⏱️</div>
+      <span id="timeSpent" class="stat-number">0min</span>
+      <div class="stat-label">Tiempo Transcurrido</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎯</div>
+      <span id="certStatus" class="stat-number">❌</span>
+      <div class="stat-label">Certificación</div>
+    </div>
+  </div>
+
+  <!-- Instrucciones -->
+  <div id="instructions" class="instructions hidden">
+    <p>
+      Lee atentamente todas las instrucciones. Para <strong>generar el certificado</strong> debes alcanzar al menos el 
+      <strong>80% de aciertos global</strong> en el conjunto de preguntas de todos los módulos.
+    </p>
+  </div>
+
+  <!-- Formulario de login -->
+  <section id="login" class="fade-in">
+    <h2>¡Bienvenido!</h2>
+    <form id="form">
+      <input id="name" name="name" type="text" placeholder="Nombre completo" required>
+      <input id="email" name="email" type="email" placeholder="Correo electrónico (@presidencia.gov.co)" required>
+      <button type="submit" class="btn-login">
+        <span id="loginText">Ingresar a la plataforma</span>
+        <span id="loginLoading" class="loading hidden"></span>
+      </button>
+    </form>
+  </section>
+
+  <!-- Contenedor de módulos -->
+  <div id="modules"></div>
+
+  <!-- Botón de certificado -->
+  <div id="cert" class="hidden">
+    <button id="certBtn" disabled>
+      Generar Certificado
+    </button>
+  </div>
+
+  <footer>&copy; 2025 Presidencia de la República de Colombia</footer>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Referencias a elementos del DOM
+      const login = document.getElementById('login');
+      const instructions = document.getElementById('instructions');
+      const modulesDiv = document.getElementById('modules');
+      const logoutBtn = document.getElementById('logout');
+      const certDiv = document.getElementById('cert');
+      const certBtn = document.getElementById('certBtn');
+      const form = document.getElementById('form');
+      const progressContainer = document.getElementById('progressContainer');
+      const progressFill = document.getElementById('progressFill');
+      const progressText = document.getElementById('progressText');
+      const statsDashboard = document.getElementById('statsDashboard');
+      const logo = new Image();
+      logo.src = 'https://media.presidencia.gov.co/Intranet/th/PRESIDENCIA.png';
+
+      // Variables de tiempo
+      let startTime = localStorage.getItem('startTime') ? parseInt(localStorage.getItem('startTime')) : null;
+      let timeInterval;
+
+      // Datos de módulos completos
+      const modulesData = [
+        {
+          titulo: 'Introducción',
+          video: 'https://media.presidencia.gov.co/Intranet/th/Induccion_2025/introduccion.mp4',
+          imagen: 'https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/introduccion.jpg',
+          preguntas: [
+            { texto: '¿Cuál es el propósito de la inducción institucional?', opciones: ['Explicar normativas internacionales','Presentar la estructura y servicios del DAPRE','Capacitar en sistemas informáticos'], correcta: 'Presentar la estructura y servicios del DAPRE' },
+            { texto: '¿Qué se busca fortalecer en los funcionarios con esta inducción?', opciones: ['Conocimiento técnico','Marco normativo','Sentido de pertenencia'], correcta: 'Sentido de pertenencia' },
+            { texto: '¿Qué misión cumple el DAPRE?', opciones: ['Emergencias','Asistir al Presidente','Supervisar territorios'], correcta: 'Asistir al Presidente' },
+            { texto: '¿Cuál es la visión del DAPRE?', opciones: ['Derechos humanos','Referente público','Paz total'], correcta: 'Referente público' },
+            { texto: '¿En qué año fue creada la Casa de Nariño?', opciones: ['1754','1918','1885'], correcta: '1918' },
+            { texto: 'Formación académica del Presidente?', opciones: ['Derecho','Economía y ambiente','Ingeniería'], correcta: 'Economía y ambiente' }
+          ]
+        },
+        {
+          titulo: 'Puntos de Encuentro',
+          video: 'https://media.presidencia.gov.co/Intranet/th/Induccion_2025/puntos%20de%20encuentro.mp4',
+          imagen: 'https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/puntos.jpg',
+          preguntas: [
+            { texto: '¿Finalidad de puntos de encuentro?', opciones: ['Evitar tráfico','Evacuación','Recreación'], correcta: 'Evacuación' },
+            { texto: '¿Al llegar a un punto de encuentro?', opciones: ['Esperar','Fotografiar','Volver'], correcta: 'Esperar' },
+            { texto: '¿Quién coordina evacuaciones?', opciones: ['Guardia','Brigadistas','Talento Humano'], correcta: 'Brigadistas' },
+            { texto: 'Ubicación de puntos de encuentro?', opciones: ['Salidas','Sótanos','Baños'], correcta: 'Salidas' },
+            { texto: 'Acción incorrecta en evacuación?', opciones: ['Calma','Correr','Seguir'], correcta: 'Correr' },
+            { texto: 'Otra función de puntos de encuentro?', opciones: ['Refrigerios','Verificar','Videos'], correcta: 'Verificar' }
+          ]
+        },
+        {
+          titulo: "Talento Humano",
+          video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/TH.mp4",
+          imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/talento_humano.jpg",
+          preguntas: [
+            { texto: "¿Cuál es el objetivo del Área de Talento Humano?", opciones: ["Gestionar recursos físicos", "Brindar bienestar y fortalecer competencias laborales", "Administrar contratos y licitaciones"], correcta: "Brindar bienestar y fortalecer competencias laborales" },
+            { texto: "¿Qué grupo gestiona las vacaciones y licencias?", opciones: ["Seguridad y Salud en el Trabajo", "Nómina", "Gestión de Personal"], correcta: "Nómina" },
+            { texto: "¿Qué espacio se ofrece a las madres lactantes?", opciones: ["Comedor", "Sala Amiga", "Consultorio médico"], correcta: "Sala Amiga" },
+            { texto: "¿Cuál de estos es un beneficio mencionado en el módulo?", opciones: ["Auto asignación de vacaciones", "Horario flexible", "Viajes internacionales"], correcta: "Horario flexible" },
+            { texto: "¿Qué canal se menciona para conocer noticias institucionales?", opciones: ["Periódico local", "Boletín Digital Entérate", "Red social externa"], correcta: "Boletín Digital Entérate" },
+            { texto: "¿Cuál es el objetivo estratégico del DAPRE en comunicación interna?", opciones: ["Promocionar productos", "Afianzar comunicación con lineamientos claros e información de calidad", "Publicar notas de prensa"], correcta: "Afianzar comunicación con lineamientos claros e información de calidad" }
+          ]
+        },
+        {
+          titulo: "Seguridad y Salud en el Trabajo",
+          video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/sst.mp4",
+          imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/sst.jpg",
+          preguntas: [
+            { texto: "¿Cuál es el propósito del Sistema de Gestión de SST?", opciones: ["Aumentar la carga laboral", "Promover el bienestar físico, mental y social", "Disminuir sueldos"], correcta: "Promover el bienestar físico, mental y social" },
+            { texto: "¿Qué busca la política de no alcohol y drogas?", opciones: ["Promover ambiente sano", "Incrementar consumo de sedantes", "Permitir tabaco en áreas comunes"], correcta: "Promover ambiente sano" },
+            { texto: "¿Cómo se identifican los brigadistas?", opciones: ["Con gorras azules", "Con chalecos rojos", "Con camisas blancas"], correcta: "Con chalecos rojos" },
+            { texto: "¿Qué número es la línea de emergencias del DAPRE?", opciones: ["123", "2299", "911"], correcta: "2299" },
+            { texto: "¿Qué incluye la definición de accidente de trabajo?", opciones: ["Solo lesiones físicas", "Eventos en traslados y actividades culturales", "Solo accidentes viales"], correcta: "Eventos en traslados y actividades culturales" },
+            { texto: "¿Qué se fortalece con la política de seguridad vial?", opciones: ["Autocuidado en movilidad", "Conducción sin casco", "Uso de motos sin licencia"], correcta: "Autocuidado en movilidad" }
+          ]
+        },
+        {
+          titulo: "Dirección Administrativa y Financiera (DAF)",
+          video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/DAF.mp4",
+          imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/daf.jpg",
+          preguntas: [
+            { texto: "¿Qué áreas dependen de la DAF?", opciones: ["Talento Humano y Planeación", "Área Administrativa, Contratos y Financiera", "SST y Sistemas"], correcta: "Área Administrativa, Contratos y Financiera" },
+            { texto: "¿Qué función cumple el Área de Contratos?", opciones: ["Auditorías internas", "Procesos en SECOP II", "Gestión de nómina"], correcta: "Procesos en SECOP II" },
+            { texto: "¿Qué grupo elabora los estados financieros?", opciones: ["Grupo de Contabilidad", "Grupo de Presupuesto", "Grupo de Pagaduría"], correcta: "Grupo de Contabilidad" },
+            { texto: "¿Qué hace el Grupo de Pagaduría?", opciones: ["Control disciplinario", "Ordenes de pago y comisiones", "Contratación externa"], correcta: "Ordenes de pago y comisiones" },
+            { texto: "¿Cuál es una función del Grupo de Presupuesto?", opciones: ["Elabora registros presupuestales", "Realiza eventos institucionales", "Administra biblioteca"], correcta: "Elabora registros presupuestales" },
+            { texto: "¿Cuál es el rol del Área Administrativa?", opciones: ["Servicios administrativos y logísticos", "Desarrollo de software", "Gestión de emergencias"], correcta: "Servicios administrativos y logísticos" }
+          ]
+        },
+        {
+          titulo: "Sistemas y Tecnologías de la Información",
+          video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/sistemas.mp4",
+          imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/sistemas.jpg",
+          preguntas: [
+            { texto: "¿Qué mejora el área de Sistemas?", opciones: ["Publicidad", "Integridad, disponibilidad y confidencialidad de las TIC", "Contratos"], correcta: "Integridad, disponibilidad y confidencialidad de las TIC" },
+            { texto: "¿Qué hace el Grupo de Telecomunicaciones?", opciones: ["Gestiona roaming y soporte celular", "Desarrolla software", "Auditorías externas"], correcta: "Gestiona roaming y soporte celular" },
+            { texto: "¿Cuál es la función del Grupo de Red?", opciones: ["Diseñar redes y comunicaciones", "Atención al público", "Seguridad física"], correcta: "Diseñar redes y comunicaciones" },
+            { texto: "¿Qué garantiza el Grupo de Plataforma TI?", opciones: ["Ambientes separados y alta disponibilidad", "Gestión de nómina", "Planeación estratégica"], correcta: "Ambientes separados y alta disponibilidad" },
+            { texto: "¿Qué hace el Grupo de Soporte de TI y Mesa de Ayuda?", opciones: ["Garantizar disponibilidad de servicios tecnológicos", "Supervisar contratos", "Mantener archivos físicos"], correcta: "Garantizar disponibilidad de servicios tecnológicos" },
+            { texto: "¿Cuál es la tarea del Grupo de Desarrollo de Software?", opciones: ["Implementar y mantener software institucional", "Organizar eventos", "Gestionar licencias"], correcta: "Implementar y mantener software institucional" }
+          ]
+        },
+        {
+          titulo: "Control Interno Disciplinario",
+          video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/ctrl%20interno%20disciplinario.mp4",
+          imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/ctrl_disciplinario.jpg",
+          preguntas: [
+            { texto: "¿Cuál es el objetivo de Control Interno Disciplinario?", opciones: ["Capacitar personal", "Investigar y sancionar faltas", "Gestionar presupuestos"], correcta: "Investigar y sancionar faltas" },
+            { texto: "¿Qué normativa rige estos procesos?", opciones: ["Ley 734 de 2002", "Ley 80 de 1993", "Ley 19 de 2018"], correcta: "Ley 734 de 2002" },
+            { texto: "¿Qué promueven para prevenir faltas?", opciones: ["Sanciones inmediatas", "Talleres de sensibilización", "Reuniones gerenciales"], correcta: "Talleres de sensibilización" },
+            { texto: "¿Qué actitud busca fomentar?", opciones: ["Desinterés", "Respeto y cumplimiento de deberes", "Competitividad"], correcta: "Respeto y cumplimiento de deberes" },
+            { texto: "¿Qué ocurre ante denuncias de corrupción?", opciones: ["Se archiva", "Se investiga en tiempo real", "Se traslada a otra entidad"], correcta: "Se investiga en tiempo real" },
+            { texto: "¿Cuál es la finalidad de sancionar faltas?", opciones: ["Despedir funcionarios", "Combatir corrupción", "Evaluar desempeño"], correcta: "Combatir corrupción" }
+          ]
+        },
+        {
+          titulo: "Oficina de Planeación",
+          video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/planeacion.mp4",
+          imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/planeacion.jpg",
+          preguntas: [
+            { texto: "¿Qué administra la Oficina de Planeación?", opciones: ["SIGEPRE", "SECOP", "SIRECI"], correcta: "SIGEPRE" },
+            { texto: "¿Qué busca SIGEPRE?", opciones: ["Auditorías externas", "Armonizar procesos eficientes", "Capacitar líderes"], correcta: "Armonizar procesos eficientes" },
+            { texto: "¿Qué consolida para rendición de cuentas?", opciones: ["Plan de Bienestar", "Informe al Congreso", "Acta de Junta"], correcta: "Informe al Congreso" },
+            { texto: "¿Qué tipo de planeación lidera?", opciones: ["Estrategica y operativa", "Jurídica y financiera", "Cultural y deportiva"], correcta: "Estrategica y operativa" },
+            { texto: "¿Con quién coordina para apoyar al Presidente?", opciones: ["Sector privado", "Entidades públicas y privadas", "Medios de comunicación"], correcta: "Entidades públicas y privadas" },
+            { texto: "¿Qué mejora con el SIG integrado?", opciones: ["Solo finanzas", "Satisfacción de clientes", "Solo RRHH"], correcta: "Satisfacción de clientes" }
+          ]
+        },
+        {
+          titulo: "Oficina de Control Interno",
+          video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/control_interno.mp4",
+          imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/control_interno.jpg",
+          preguntas: [
+            { texto: "¿Cuál es el propósito de Control Interno?", opciones: ["Sancionar funcionarios", "Asesorar e implementar SIG", "Organizar eventos"], correcta: "Asesorar e implementar SIG" },
+            { texto: "¿Qué garantiza este SIG?", opciones: ["Decisiones oportunas", "Capacitación técnica", "Publicidad institucional"], correcta: "Decisiones oportunas" },
+            { texto: "¿Qué evalúa esta oficina?", opciones: ["Riesgos financieros", "Mejoramiento del SIG", "Plan de Comunicación"], correcta: "Mejoramiento del SIG" },
+            { texto: "¿Cuál es una acción clave de Control Interno?", opciones: ["Auditorías externas", "Capacitaciones obligatorias", "Definir políticas de contratación"], correcta: "Capacitaciones obligatorias" },
+            { texto: "¿Contra qué direccionamiento estratégico trabaja?", opciones: ["Gobierno digital", "Direccionamiento estratégico de la entidad", "Planeación municipal"], correcta: "Direccionamiento estratégico de la entidad" },
+            { texto: "¿Qué apoya en la toma de decisiones?", opciones: ["Informe al Congreso", "SIG integrado", "Comités técnicos"], correcta: "SIG integrado" }
+          ]
+        },
+        {
+          titulo: "Relacionamiento con el Ciudadano",
+          video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/relacionamiento.mp4",
+          imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/ciudadano.jpg",
+          preguntas: [
+            { texto: "¿Qué atiende el Grupo de Atención a la Ciudadanía?", opciones: ["Eventos institucionales", "Requerimientos internos y externos", "Auditorías internas"], correcta: "Requerimientos internos y externos" },
+            { texto: "¿Qué gestiona en documentos?", opciones: ["Archivo histórico", "Radicación y remisión por competencias", "Traducciones oficiales"], correcta: "Radicación y remisión por competencias" },
+            { texto: "¿Qué busca garantizar?", opciones: ["Eficiencia financiera", "Prestación oportuna de servicios", "Desarrollo tecnológico"], correcta: "Prestación oportuna de servicios" },
+            { texto: "¿Qué canales utiliza?", opciones: ["Solo presenciales", "Internos y externos", "Solo digitales"], correcta: "Internos y externos" },
+            { texto: "¿Qué competencia aplica?", opciones: ["Competencia territorial", "Competencia por funciones", "Competencia internacional"], correcta: "Competencia por funciones" },
+            { texto: "¿Qué medio emplea para seguimiento?", opciones: ["Buzón físico", "Sistema de PQRS", "Llamadas telefónicas"], correcta: "Sistema de PQRS" }
+          ]
+        },
+        {
+          titulo: "Recorrido por el Palacio",
+          video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/recorrido.mp4",
+          imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/recorrido.jpg",
+          preguntas: [
+            { texto: "¿Dónde ocurre el cambio de guardia?", opciones: ["Salón Virreinal", "Plaza de Armas", "Salón Independencia"], correcta: "Plaza de Armas" },
+            { texto: "¿Qué colegio está junto al Capitolio?", opciones: ["San Bartolomé", "San Carlos", "San Ignacio"], correcta: "San Bartolomé" },
+            { texto: "¿Quién construyó el Capitolio Nacional?", opciones: ["Francisco de Paula Santander", "Tomás Cipriano de Mosquera y Thomas Reed", "Antonio Nariño"], correcta: "Tomás Cipriano de Mosquera y Thomas Reed" },
+            { texto: "¿Qué objeto regaló Francia?", opciones: ["Candelabro de baccarat", "Jarrón de porcelana Fausto de Santi Blum", "Mesa Napoleón"], correcta: "Jarrón de porcelana Fausto de Santi Blum" },
+            { texto: "¿Qué elemento embalsamó el artista en el Salón Virreinal?", opciones: ["Un ave", "Un insecto", "Un mamífero"], correcta: "Un insecto" },
+            { texto: "¿Dónde se exhibe la espada de Bolívar?", opciones: ["Galería Expresiva", "Galería Godino", "Salón Colombia"], correcta: "Galería Expresiva" }
+          ]
+        }
+      ];
+
+      // Estado persistente
+      let completed = JSON.parse(localStorage.getItem('completed') || '[]');
+      let scores = JSON.parse(localStorage.getItem('scores') || '{}');
+      let currentUser = localStorage.getItem('user');
+      let currentEmail = localStorage.getItem('email');
+
+      // Funciones de utilidad
+      function emailValido(email) {
+        return email.toLowerCase().endsWith('@presidencia.gov.co');
+      }
+
+      function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          padding: 1rem 1.5rem;
+          border-radius: 8px;
+          color: white;
+          font-weight: 600;
+          z-index: 10000;
+          animation: slideIn 0.3s ease-out;
+          max-width: 300px;
+        `;
+        
+        const colors = {
+          success: 'linear-gradient(135deg, #22c55e, #16a34a)',
+          warning: 'linear-gradient(135deg, #f59e0b, #d97706)',
+          error: 'linear-gradient(135deg, #ef4444, #dc2626)',
+          info: 'linear-gradient(135deg, #3b82f6, #2563eb)'
+        };
+        
+        notification.style.background = colors[type] || colors.info;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 4000);
+      }
+
+      function updateStats() {
+        const totalModules = modulesData.length;
+        const completedCount = Object.keys(scores).length;
+        const correctSum = Object.values(scores).reduce((sum, c) => sum + c, 0);
+        const totalPreguntas = totalModules * 2;
+        const globalPct = Math.round((correctSum / totalPreguntas) * 100);
+        
+        // Actualizar elementos del DOM
+        document.getElementById('globalScore').textContent = `${globalPct}%`;
+        document.getElementById('completedModules').textContent = `${completedCount}/${totalModules}`;
+        document.getElementById('certStatus').textContent = globalPct >= 80 ? '✅' : '❌';
+        
+        // Actualizar barra de progreso
+        const progressPercent = (completedCount / totalModules) * 100;
+        progressFill.style.width = `${progressPercent}%`;
+        progressText.textContent = `Progreso: ${Math.round(progressPercent)}% (${completedCount}/${totalModules} módulos completados)`;
+        
+        // Actualizar tiempo
+        if (startTime) {
+          const elapsed = Math.floor((Date.now() - startTime) / 60000);
+          document.getElementById('timeSpent').textContent = `${elapsed}min`;
+        }
+      }
+
+      function startTimer() {
+        if (!startTime) {
+          startTime = Date.now();
+          localStorage.setItem('startTime', startTime.toString());
+        }
+        
+        timeInterval = setInterval(() => {
+          updateStats();
+        }, 60000);
+      }
+
+      // Renderizar módulos
+      function renderModules() {
+        modulesDiv.innerHTML = '';
+
+        modulesData.forEach((mod, i) => {
+          const card = document.createElement('div');
+          const unlocked = (i === 0 || (scores[i - 1] >= 1));
+
+          card.className = unlocked ? 'module active fade-in' : 'module locked';
+          card.innerHTML = `
+            <div class="banner">
+              <img src="${mod.imagen}" alt="${mod.titulo}">
+              <h3>${mod.titulo}</h3>
+            </div>
+            <div class="module-content">
+              <video controls data-i="${i}">
+                <source src="${mod.video}" type="video/mp4">
+                Tu navegador no soporta el elemento de video.
+              </video>
+              <div class="questions"></div>
+              <button class="btn-send">📤 Enviar respuestas</button>
+              <div class="resultado" id="resultado-${i}"></div>
+            </div>
+          `;
+          
+          modulesDiv.appendChild(card);
+
+          const videoEl = card.querySelector('video');
+          const qdiv = card.querySelector('.questions');
+          const btn = card.querySelector('.btn-send');
+          const resDiv = card.querySelector(`#resultado-${i}`);
+
+          if (!unlocked) {
+            videoEl.removeAttribute('controls');
+          } else {
+            videoEl.controls = true;
+            videoEl.onended = () => askQuestions(mod, i, qdiv, btn);
+          }
+
+          // Mostrar puntuación si existe
+          if (scores.hasOwnProperty(i)) {
+            const c = scores[i];
+            const pct = Math.round((c / 2) * 100);
+            resDiv.textContent = `Puntaje obtenido: ${pct}%`;
+            resDiv.className = `resultado ${pct === 100 ? 'success' : pct === 50 ? 'warning' : 'danger'}`;
+          }
+
+          if (unlocked) {
+            btn.onclick = () => submitAnswers(mod, i, qdiv, btn, resDiv);
+          }
+        });
+
+        checkCompletionAndEnableCert();
+      }
+
+      // Mostrar preguntas
+      function askQuestions(mod, idx, container, btn) {
+        container.innerHTML = '';
+        const sel = [...mod.preguntas].sort(() => Math.random() - 0.5).slice(0, 2);
+        container._sel = sel;
+
+        sel.forEach((p, j) => {
+          const divQ = document.createElement('div');
+          divQ.className = 'question-item fade-in';
+          divQ.innerHTML = `
+            <p>${j + 1}. ${p.texto}</p>
+            ${p.opciones.map(opt => `
+              <label>
+                <input name="q${idx}_${j}" type="radio" value="${opt}">
+                ${opt}
+              </label>
+            `).join('')}
+          `;
+          container.appendChild(divQ);
+        });
+
+        btn.disabled = false;
+        btn.classList.add('visible');
+      }
+
+      // Procesar respuestas
+      function submitAnswers(mod, idx, container, btn, resDiv) {
+        const sel = container._sel || [];
+        const respuestas = [];
+
+        sel.forEach((p, j) => {
+          const opc = container.querySelector(`input[name="q${idx}_${j}"]:checked`);
+          if (opc) respuestas.push(opc.value);
+        });
+
+        if (respuestas.length < sel.length) {
+          showNotification('Por favor contesta todas las preguntas', 'warning');
+          return;
+        }
+
+        let correct = 0;
+        sel.forEach((p, j) => {
+          if (respuestas[j] === p.correcta) correct++;
+        });
+
+        const pct = Math.round((correct / sel.length) * 100);
+
+        // Guardar puntuación
+        scores[idx] = correct;
+        localStorage.setItem('scores', JSON.stringify(scores));
+
+        // Mostrar resultado
+        if (correct === 0) {
+          showNotification('Obtuviste 0%. Revisa nuevamente el video.', 'error');
+          resDiv.textContent = `Puntaje obtenido: 0%`;
+          resDiv.className = 'resultado danger';
+        } else if (correct === 1) {
+          showNotification('Obtuviste 50%. Puedes continuar, pero necesitas 80% global para el certificado.', 'warning');
+          resDiv.textContent = `Puntaje obtenido: 50%`;
+          resDiv.className = 'resultado warning';
+          unlockNextModule(idx);
+        } else {
+          showNotification('¡Excelente! Obtuviste 100%.', 'success');
+          resDiv.textContent = `Puntaje obtenido: 100%`;
+          resDiv.className = 'resultado success';
+          if (!completed.includes(idx)) {
+            completed.push(idx);
+            localStorage.setItem('completed', JSON.stringify(completed));
+          }
+          unlockNextModule(idx);
+        }
+
+        btn.disabled = true;
+        updateStats();
+        checkCompletionAndEnableCert();
+      }
+
+      // Desbloquear siguiente módulo
+      function unlockNextModule(idx) {
+        const nextCard = modulesDiv.children[idx + 1];
+        if (nextCard && nextCard.classList.contains('locked')) {
+          nextCard.classList.remove('locked');
+          nextCard.classList.add('active', 'fade-in');
+          
+          const nextVideo = nextCard.querySelector('video');
+          nextVideo.controls = true;
+          nextVideo.onended = () => askQuestions(
+            modulesData[idx + 1],
+            idx + 1,
+            nextCard.querySelector('.questions'),
+            nextCard.querySelector('.btn-send')
+          );
+          
+          const nextBtn = nextCard.querySelector('.btn-send');
+          const nextRes = nextCard.querySelector(`#resultado-${idx + 1}`);
+          nextBtn.onclick = () => submitAnswers(
+            modulesData[idx + 1],
+            idx + 1,
+            nextCard.querySelector('.questions'),
+            nextBtn,
+            nextRes
+          );
+        }
+      }
+
+      // Verificar certificación
+      function checkCompletionAndEnableCert() {
+        const totalModules = modulesData.length;
+        const correctSum = Object.values(scores).reduce((sum, c) => sum + c, 0);
+        const totalPreguntas = totalModules * 2;
+        const globalPct = (correctSum / totalPreguntas) * 100;
+
+        if (globalPct >= 80) {
+          certBtn.disabled = false;
+        } else {
+          certBtn.disabled = true;
+        }
+
+        // Alerta si completó todos sin llegar al 80%
+        const respondedAll = Object.keys(scores).length === totalModules;
+        if (respondedAll && globalPct < 80) {
+          showNotification(`Completaste todos los módulos pero tienes ${Math.round(globalPct)}%. Necesitas 80% para el certificado.`, 'warning');
+        }
+      }
+
+      // Inicialización de la aplicación
+      if (currentUser && currentEmail) {
+        login.classList.add('hidden');
+        instructions.classList.remove('hidden');
+        logoutBtn.classList.remove('hidden');
+        certDiv.classList.remove('hidden');
+        progressContainer.classList.remove('hidden');
+        statsDashboard.classList.remove('hidden');
+        renderModules();
+        startTimer();
+        updateStats();
+      }
+
+      // Manejo del login
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim().toLowerCase();
+        const loginText = document.getElementById('loginText');
+        const loginLoading = document.getElementById('loginLoading');
+
+        if (!name || !email) {
+          showNotification('Por favor completa todos los campos', 'warning');
+          return;
+        }
+        
+        if (!emailValido(email)) {
+          showNotification('El correo debe ser @presidencia.gov.co', 'error');
+          return;
+        }
+
+        // Mostrar loading
+        loginText.classList.add('hidden');
+        loginLoading.classList.remove('hidden');
+
+        // Simular carga
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        localStorage.setItem('user', name);
+        localStorage.setItem('email', email);
+        currentUser = name;
+        currentEmail = email;
+
+        login.classList.add('hidden');
+        instructions.classList.remove('hidden');
+        logoutBtn.classList.remove('hidden');
+        certDiv.classList.remove('hidden');
+        progressContainer.classList.remove('hidden');
+        statsDashboard.classList.remove('hidden');
+        
+        renderModules();
+        startTimer();
+        updateStats();
+        
+        showNotification(`¡Bienvenido ${name}!`, 'success');
+      });
+
+      // Logout
+      logoutBtn.addEventListener('click', () => {
+        if (confirm('¿Estás seguro de que quieres cerrar sesión? Se perderá todo el progreso.')) {
+          localStorage.clear();
+          clearInterval(timeInterval);
+          location.reload();
+        }
+      });
+
+      // Generar certificado
+      certBtn.onclick = () => {
+        const vals = Object.values(scores);
+        const correctSum = vals.reduce((sum, c) => sum + c, 0);
+        const totalPreg = modulesData.length * 2;
+        const avgPct = Math.round((correctSum / totalPreg) * 100);
+
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+          showNotification('Error al cargar el generador de PDF', 'error');
+          return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const name = localStorage.getItem('user');
+        const email = localStorage.getItem('email');
+        const dateStr = new Date().toLocaleDateString('es-CO', { 
+          day: 'numeric', 
+          month: 'long', 
+          year: 'numeric' 
+        });
+
+        // Diseño del certificado
+        doc.addImage(logo, 'PNG', 65, 10, 80, 40);
+        doc.setFontSize(24);
+        doc.setTextColor(65, 102, 197);
+        doc.text('CERTIFICADO DE FINALIZACIÓN', 105, 70, null, null, 'center');
+        
+        doc.setFontSize(16);
+        doc.setTextColor(0, 0, 0);
+        doc.text('Inducción Presidencia de la República', 105, 85, null, null, 'center');
+        
+        doc.setFontSize(14);
+        doc.text(`Se certifica que ${name}`, 105, 110, null, null, 'center');
+        doc.text(`(${email})`, 105, 125, null, null, 'center');
+        doc.text(`ha completado satisfactoriamente la inducción institucional`, 105, 140, null, null, 'center');
+        doc.text(`con una calificación global de ${avgPct}%`, 105, 155, null, null, 'center');
+        
+        doc.setFontSize(12);
+        doc.text(`Fecha de emisión: ${dateStr}`, 105, 180, null, null, 'center');
+        doc.text('Departamento Administrativo de la Presidencia de la República', 105, 195, null, null, 'center');
+
+        window.open(doc.output('bloburl'), '_blank');
+        showNotification('¡Certificado generado exitosamente!', 'success');
+      };
+
+    });
+  </script>
+</body>
+</html>

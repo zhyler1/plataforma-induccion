@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Administrativo - Inducción SIGEPRE</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-blue: #4166c5;
+      --primary-blue-dark: #2d4a8f;
+      --success-green: #22c55e;
+      --warning-yellow: #f59e0b;
+      --danger-red: #ef4444;
+      --info-blue: #3b82f6;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-700: #374151;
+      --gray-900: #111827;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, rgba(65, 102, 197, 0.05) 0%, rgba(255, 255, 255, 1) 100%);
+      color: var(--gray-900);
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+    }
+
+    header p {
+      opacity: 0.9;
+      margin-top: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .tabs {
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      position: sticky;
+      top: 89px;
+      z-index: 99;
+    }
+
+    .tab {
+      padding: 1rem 2rem;
+      background: white;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--gray-700);
+      transition: all 0.2s;
+    }
+
+    .tab:hover {
+      background: var(--gray-50);
+    }
+
+    .tab.active {
+      color: var(--primary-blue);
+      border-bottom-color: var(--primary-blue);
+      background: var(--gray-50);
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+    }
+
+    .btn-primary {
+      background: var(--primary-blue);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-blue-dark);
+    }
+
+    .btn-success {
+      background: var(--success-green);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #16a34a;
+    }
+
+    .btn-warning {
+      background: var(--warning-yellow);
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #d97706;
+    }
+
+    .btn-danger {
+      background: var(--danger-red);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-secondary {
+      background: var(--gray-700);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-900);
+    }
+
+    .btn-small {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary-blue);
+      display: block;
+    }
+
+    .stat-label {
+      color: var(--gray-700);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.875rem;
+      letter-spacing: 0.05em;
+      margin-top: 0.5rem;
+    }
+
+    .filters {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filters input,
+    .filters select {
+      padding: 0.75rem;
+      border: 2px solid var(--gray-100);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .filters input:focus,
+    .filters select:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+    }
+
+    .bulk-actions {
+      background: white;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      margin-bottom: 1rem;
+      display: none;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .bulk-actions.active {
+      display: flex;
+    }
+
+    .bulk-actions-text {
+      flex: 1;
+      font-weight: 600;
+    }
+
+    .table-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: var(--gray-50);
+    }
+
+    th {
+      text-align: left;
+      padding: 1rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      text-transform: uppercase;
+      font-size: 0.875rem;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 1rem;
+      border-top: 1px solid var(--gray-100);
+    }
+
+    tbody tr:hover {
+      background: var(--gray-50);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-warning {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge-danger {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .badge-info {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: var(--gray-100);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--success-green), var(--primary-blue));
+      transition: width 0.3s;
+    }
+
+    .actions-cell {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid var(--gray-100);
+      padding-bottom: 1rem;
+    }
+
+    .modal-header h2 {
+      font-size: 1.5rem;
+      color: var(--gray-900);
+    }
+
+    .modal-body {
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      border-top: 2px solid var(--gray-100);
+      padding-top: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--gray-100);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-weight: 500;
+      animation: slideIn 0.3s;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(-100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .alert-success {
+      background: #dcfce7;
+      color: #166534;
+      border: 2px solid #22c55e;
+    }
+
+    .alert-danger {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 2px solid #ef4444;
+    }
+
+    .alert-warning {
+      background: #fef3c7;
+      color: #92400e;
+      border: 2px solid #f59e0b;
+    }
+
+    .alert-info {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 2px solid #3b82f6;
+    }
+
+    .checkbox {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .chart-container {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      margin-bottom: 2rem;
+    }
+
+    .chart-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--gray-900);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--gray-700);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--gray-700);
+    }
+
+    .empty-state h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .filters {
+        flex-direction: column;
+      }
+
+      .filters input,
+      .filters select {
+        width: 100%;
+      }
+
+      .tabs {
+        overflow-x: auto;
+      }
+
+      .tab {
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Panel Administrativo</h1>
+      <p>Sistema de Inducción SIGEPRE - Presidencia de la República</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" onclick="window.location.href='/'">Volver a Plataforma</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="cambiarTab('dashboard')">Dashboard</button>
+    <button class="tab" onclick="cambiarTab('usuarios')">Usuarios</button>
+    <button class="tab" onclick="cambiarTab('empleados')">Empleados</button>
+    <button class="tab" onclick="cambiarTab('reportes')">Reportes</button>
+    <button class="tab" onclick="cambiarTab('configuracion')">Configuración</button>
+  </div>
+
+  <div class="container">
+    <div id="alertContainer"></div>
+
+    <!-- TAB: DASHBOARD -->
+    <div id="tab-dashboard" class="tab-content active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span id="totalUsuarios" class="stat-number">0</span>
+          <div class="stat-label">Total Usuarios</div>
+        </div>
+        <div class="stat-card">
+          <span id="usuariosAprobados" class="stat-number">0</span>
+          <div class="stat-label">Usuarios Aprobados</div>
+        </div>
+        <div class="stat-card">
+          <span id="certificadosEmitidos" class="stat-number">0</span>
+          <div class="stat-label">Certificados Emitidos</div>
+        </div>
+        <div class="stat-card">
+          <span id="promedioCalificacion" class="stat-number">0%</span>
+          <div class="stat-label">Promedio Global</div>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <h3 class="chart-title">Módulos con Menor Rendimiento</h3>
+        <div id="rendimientoModulos"></div>
+      </div>
+
+      <div class="chart-container">
+        <h3 class="chart-title">Actividad Reciente</h3>
+        <div id="actividadReciente"></div>
+      </div>
+    </div>
+
+    <!-- TAB: USUARIOS -->
+    <div id="tab-usuarios" class="tab-content">
+      <div class="filters">
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Buscar por nombre o email..."
+        >
+        <select id="estadoFilter">
+          <option value="">Todos los estados</option>
+          <option value="Aprobado">Aprobados</option>
+          <option value="En Progreso">En Progreso</option>
+          <option value="Sin Progreso">Sin Progreso</option>
+        </select>
+        <input type="date" id="fechaInicio" placeholder="Fecha inicio">
+        <input type="date" id="fechaFin" placeholder="Fecha fin">
+        <button class="btn btn-primary" onclick="aplicarFiltros()">Filtrar</button>
+        <button class="btn btn-secondary" onclick="limpiarFiltros()">Limpiar</button>
+        <button class="btn btn-success" onclick="exportarCSV()">Exportar CSV</button>
+      </div>
+
+      <div class="bulk-actions" id="bulkActions">
+        <span class="bulk-actions-text"><span id="selectedCount">0</span> usuarios seleccionados</span>
+        <button class="btn btn-small btn-warning" onclick="resetearSeleccionados()">Resetear Progreso</button>
+        <button class="btn btn-small btn-danger" onclick="eliminarSeleccionados()">Eliminar Usuarios</button>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th><input type="checkbox" class="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+              <th>Usuario</th>
+              <th>Email</th>
+              <th>Progreso</th>
+              <th>Calificación</th>
+              <th>Estado</th>
+              <th>Certificado</th>
+              <th>Fecha Registro</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="usuariosTable">
+            <tr>
+              <td colspan="9" class="loading">Cargando datos...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: EMPLEADOS -->
+    <div id="tab-empleados" class="tab-content">
+      <div class="filters">
+        <input 
+          type="text" 
+          id="searchEmpleado" 
+          placeholder="Buscar empleado..."
+        >
+        <select id="estadoEmpleadoFilter">
+          <option value="">Todos</option>
+          <option value="activo">Activos</option>
+          <option value="inactivo">Inactivos</option>
+        </select>
+        <button class="btn btn-primary" onclick="aplicarFiltrosEmpleados()">Filtrar</button>
+        <button class="btn btn-success" onclick="abrirModalNuevoEmpleado()">Agregar Empleado</button>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Cédula</th>
+              <th>Nombre Completo</th>
+              <th>Estado</th>
+              <th>Fecha Registro</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="empleadosTable">
+            <tr>
+              <td colspan="5" class="loading">Cargando empleados...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: REPORTES -->
+    <div id="tab-reportes" class="tab-content">
+      <div class="filters">
+        <input type="date" id="reporteInicio">
+        <input type="date" id="reporteFin">
+        <button class="btn btn-primary" onclick="generarReportePeriodo()">Generar Reporte</button>
+      </div>
+
+      <div id="reporteResultados"></div>
+
+      <div class="chart-container">
+        <h3 class="chart-title">Logs del Sistema</h3>
+        <button class="btn btn-secondary btn-small" onclick="cargarLogs()">Actualizar Logs</button>
+        <div id="logsContainer"></div>
+      </div>
+    </div>
+
+    <!-- TAB: CONFIGURACIÓN -->
+    <div id="tab-configuracion" class="tab-content">
+      <div class="chart-container">
+        <h3 class="chart-title">Configuración del Sistema</h3>
+        
+        <div class="form-group">
+          <label>Umbral de Aprobación (%)</label>
+          <input type="number" id="umbralAprobacion" value="80" min="0" max="100">
+        </div>
+
+        <div class="form-group">
+          <label>Número de Preguntas por Módulo</label>
+          <input type="number" id="preguntasPorModulo" value="2" min="1" max="10">
+        </div>
+
+        <button class="btn btn-success" onclick="guardarConfiguracion()">Guardar Configuración</button>
+      </div>
+
+      <div class="chart-container">
+        <h3 class="chart-title">Backup de Base de Datos</h3>
+        <p style="margin-bottom: 1rem;">Descarga un respaldo completo de la base de datos.</p>
+        <button class="btn btn-primary" onclick="descargarBackup()">Descargar Backup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALES -->
+  
+  <!-- Modal de confirmación -->
+  <div class="modal" id="confirmModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="confirmTitle">Confirmar Acción</h2>
+      </div>
+      <div class="modal-body">
+        <p id="confirmMessage"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModal('confirmModal')">Cancelar</button>
+        <button class="btn btn-danger" id="confirmBtn" onclick="ejecutarAccion()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de detalles de usuario -->
+  <div class="modal" id="detallesModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Detalles del Usuario</h2>
+      </div>
+      <div class="modal-body" id="detallesContent"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModal('detallesModal')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de editar usuario -->
+  <div class="modal" id="editarModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Editar Usuario</h2>
+      </div>
+      <div class="modal-body">
+        <form id="editarForm">
+          <input type="hidden" id="editUserId">
+          <div class="form-group">
+            <label>Nombre Completo</label>
+            <input type="text" id="editNombre" required>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="editEmail" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModal('editarModal')">Cancelar</button>
+        <button class="btn btn-primary" onclick="guardarEdicionUsuario()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal nuevo empleado -->
+  <div class="modal" id="nuevoEmpleadoModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Agregar Empleado</h2>
+      </div>
+      <div class="modal-body">
+        <form id="nuevoEmpleadoForm">
+          <div class="form-group">
+            <label>Cédula</label>
+            <input type="text" id="nuevoCedula" required pattern="[0-9]+">
+          </div>
+          <div class="form-group">
+            <label>Nombre Completo</label>
+            <input type="text" id="nuevoNombre" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModal('nuevoEmpleadoModal')">Cancelar</button>
+        <button class="btn btn-success" onclick="guardarNuevoEmpleado()">Agregar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ========================================
+    // VARIABLES GLOBALES
+    // ========================================
+    let todosLosUsuarios = [];
+    let todosLosEmpleados = [];
+    let usuariosSeleccionados = [];
+    let accionPendiente = null;
+    const API_BASE = '/api';
+
+    // ========================================
+    // NAVEGACIÓN POR TABS
+    // ========================================
+    function cambiarTab(tabName) {
+      // Ocultar todos los tabs
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      
+      // Mostrar tab seleccionado
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+      event.target.classList.add('active');
+
+      // Cargar datos según el tab
+      if (tabName === 'dashboard') cargarDashboard();
+      if (tabName === 'usuarios') cargarUsuarios();
+      if (tabName === 'empleados') cargarEmpleados();
+    }
+
+    // ========================================
+    // CARGA DE DATOS
+    // ========================================
+    async function cargarDashboard() {
+      try {
+        const statsRes = await fetch(`${API_BASE}/admin/estadisticas`);
+        const stats = await statsRes.json();
+        
+        if (stats.success) {
+          document.getElementById('totalUsuarios').textContent = stats.data.resumen.total_usuarios || 0;
+          document.getElementById('usuariosAprobados').textContent = stats.data.resumen.usuarios_aprobados || 0;
+          document.getElementById('certificadosEmitidos').textContent = stats.data.resumen.usuarios_certificados || 0;
+          document.getElementById('promedioCalificacion').textContent = Math.round(stats.data.resumen.promedio_calificacion || 0) + '%';
+        }
+
+        // Cargar rendimiento de módulos
+        const rendimientoRes = await fetch(`${API_BASE}/admin/modulos/rendimiento`);
+        const rendimiento = await rendimientoRes.json();
+        
+        if (rendimiento.success) {
+          mostrarRendimientoModulos(rendimiento.data);
+        }
+
+        // Cargar logs recientes
+        const logsRes = await fetch(`${API_BASE}/admin/logs?limit=10`);
+        const logs = await logsRes.json();
+        
+        if (logs.success) {
+          mostrarActividadReciente(logs.data);
+        }
+      } catch (error) {
+        console.error('Error cargando dashboard:', error);
+        mostrarAlerta('Error cargando dashboard', 'danger');
+      }
+    }
+
+    async function cargarUsuarios() {
+      try {
+        const usuariosRes = await fetch(`${API_BASE}/admin/usuarios?limit=100`);
+        const usuarios = await usuariosRes.json();
+        
+        if (usuarios.success) {
+          todosLosUsuarios = usuarios.data.usuarios;
+          renderizarTablaUsuarios(todosLosUsuarios);
+        }
+      } catch (error) {
+        console.error('Error cargando usuarios:', error);
+        mostrarAlerta('Error cargando usuarios', 'danger');
+      }
+    }
+
+    async function cargarEmpleados() {
+      try {
+        const empleadosRes = await fetch(`${API_BASE}/admin/empleados`);
+        const empleados = await empleadosRes.json();
+        
+        if (empleados.success) {
+          todosLosEmpleados = empleados.data;
+          renderizarTablaEmpleados(todosLosEmpleados);
+        }
+      } catch (error) {
+        console.error('Error cargando empleados:', error);
+        mostrarAlerta('Error cargando empleados', 'danger');
+      }
+    }
+
+    // ========================================
+    // RENDERIZADO DE TABLAS
+    // ========================================
+    function renderizarTablaUsuarios(usuarios) {
+      const tbody = document.getElementById('usuariosTable');
+      
+      if (!usuarios || usuarios.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><h3>No hay usuarios registrados</h3></td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = usuarios.map(user => {
+        const progreso = user.porcentaje_progreso || 0;
+        const calificacion = Math.round(user.calificacion_global || 0);
+        const estado = user.estado_certificacion || 'Sin Progreso';
+        
+        let badgeClass = 'badge-info';
+        if (estado === 'Aprobado') badgeClass = 'badge-success';
+        else if (estado === 'En Progreso') badgeClass = 'badge-warning';
+        else if (estado === 'Reprobado') badgeClass = 'badge-danger';
+
+        const fechaRegistro = new Date(user.fecha_registro).toLocaleDateString('es-CO', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
+
+        const isSelected = usuariosSeleccionados.includes(user.id);
+
+        return `
+          <tr>
+            <td><input type="checkbox" class="checkbox user-checkbox" data-user-id="${user.id}" ${isSelected ? 'checked' : ''} onchange="toggleUsuario(${user.id})"></td>
+            <td><strong>${user.nombre}</strong></td>
+            <td>${user.email}</td>
+            <td>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div class="progress-bar-container" style="flex: 1;">
+                  <div class="progress-bar" style="width: ${progreso}%"></div>
+                </div>
+                <span style="font-size: 0.875rem; color: var(--gray-700);">${Math.round(progreso)}%</span>
+              </div>
+              <small style="color: var(--gray-700);">${user.modulos_completados || 0}/11 módulos</small>
+            </td>
+            <td>
+              <strong style="color: ${calificacion >= 80 ? 'var(--success-green)' : calificacion >= 50 ? 'var(--warning-yellow)' : 'var(--danger-red)'}">
+                ${calificacion}%
+              </strong>
+            </td>
+            <td><span class="badge ${badgeClass}">${estado}</span></td>
+            <td>
+              ${user.codigo_verificacion 
+                ? `<span style="font-family: monospace; font-size: 0.875rem;">${user.codigo_verificacion}</span>`
+                : '<span style="color: var(--gray-700);">—</span>'
+              }
+            </td>
+            <td>${fechaRegistro}</td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn btn-small btn-primary" onclick="verDetalles(${user.id})">Ver</button>
+                <button class="btn btn-small btn-secondary" onclick="editarUsuario(${user.id})">Editar</button>
+                <button class="btn btn-small btn-warning" onclick="resetearProgreso(${user.id})">Reset</button>
+                <button class="btn btn-small btn-danger" onclick="eliminarUsuario(${user.id})">Eliminar</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderizarTablaEmpleados(empleados) {
+      const tbody = document.getElementById('empleadosTable');
+      
+      if (!empleados || empleados.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><h3>No hay empleados registrados</h3></td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = empleados.map(emp => {
+        const estadoClass = emp.estado === 'activo' ? 'badge-success' : 'badge-danger';
+        const fechaRegistro = new Date(emp.fecha_registro).toLocaleDateString('es-CO');
+
+        return `
+          <tr>
+            <td>${emp.cedula}</td>
+            <td><strong>${emp.nombre_completo}</strong></td>
+            <td><span class="badge ${estadoClass}">${emp.estado}</span></td>
+            <td>${fechaRegistro}</td>
+            <td>
+              <div class="actions-cell">
+                ${emp.estado === 'activo' 
+                  ? `<button class="btn btn-small btn-warning" onclick="desactivarEmpleado('${emp.cedula}')">Desactivar</button>`
+                  : `<button class="btn btn-small btn-success" onclick="activarEmpleado('${emp.cedula}')">Activar</button>`
+                }
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function mostrarRendimientoModulos(data) {
+      const container = document.getElementById('rendimientoModulos');
+      
+      if (!data || data.length === 0) {
+        container.innerHTML = '<p class="empty-state">No hay datos disponibles</p>';
+        return;
+      }
+
+      container.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Módulo</th>
+              <th>Respuestas</th>
+              <th>Promedio</th>
+              <th>Perfectos</th>
+              <th>Ceros</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.map(modulo => `
+              <tr>
+                <td><strong>${modulo.nombre}</strong></td>
+                <td>${modulo.total_respuestas || 0}</td>
+                <td>${Math.round(modulo.promedio || 0)}%</td>
+                <td>${modulo.perfectos || 0}</td>
+                <td>${modulo.ceros || 0}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function mostrarActividadReciente(logs) {
+      const container = document.getElementById('actividadReciente');
+      
+      if (!logs || logs.length === 0) {
+        container.innerHTML = '<p class="empty-state">No hay actividad reciente</p>';
+        return;
+      }
+
+      container.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Acción</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${logs.map(log => `
+              <tr>
+                <td>${log.nombre || 'Sistema'}</td>
+                <td>${log.accion}</td>
+                <td>${new Date(log.fecha).toLocaleString('es-CO')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    // ========================================
+    // GESTIÓN DE USUARIOS
+    // ========================================
+    async function verDetalles(userId) {
+      try {
+        const res = await fetch(`${API_BASE}/admin/usuarios/${userId}/detalle`);
+        const data = await res.json();
+        
+        if (!data.success) throw new Error(data.message);
+
+        const { usuario, respuestas } = data.data;
+
+        const content = `
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Nombre:</label>
+              <p>${usuario.nombre}</p>
+            </div>
+            <div class="form-group">
+              <label>Email:</label>
+              <p>${usuario.email}</p>
+            </div>
+            <div class="form-group">
+              <label>Progreso:</label>
+              <p>${usuario.modulos_completados || 0}/11 módulos (${Math.round(usuario.porcentaje_progreso || 0)}%)</p>
+            </div>
+            <div class="form-group">
+              <label>Calificación Global:</label>
+              <p><strong>${Math.round(usuario.calificacion_global || 0)}%</strong></p>
+            </div>
+            <div class="form-group">
+              <label>Estado:</label>
+              <p>${usuario.estado_certificacion || 'Sin Progreso'}</p>
+            </div>
+            ${usuario.codigo_verificacion ? `
+            <div class="form-group">
+              <label>Código de Certificado:</label>
+              <p style="font-family: monospace;">${usuario.codigo_verificacion}</p>
+            </div>
+            ` : ''}
+            <div class="form-group">
+              <label>Fecha de Registro:</label>
+              <p>${new Date(usuario.fecha_registro).toLocaleString('es-CO')}</p>
+            </div>
+            ${usuario.ultima_actividad ? `
+            <div class="form-group">
+              <label>Última Actividad:</label>
+              <p>${new Date(usuario.ultima_actividad).toLocaleString('es-CO')}</p>
+            </div>
+            ` : ''}
+          </div>
+          
+          ${respuestas && respuestas.length > 0 ? `
+            <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">Respuestas por Módulo</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Módulo</th>
+                  <th>Aciertos</th>
+                  <th>Porcentaje</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${respuestas.map(r => `
+                  <tr>
+                    <td>${r.modulo_nombre}</td>
+                    <td>${r.aciertos}/${r.total_preguntas}</td>
+                    <td><strong>${r.porcentaje}%</strong></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          ` : ''}
+        `;
+
+        document.getElementById('detallesContent').innerHTML = content;
+        abrirModal('detallesModal');
+      } catch (error) {
+        console.error('Error obteniendo detalles:', error);
+        mostrarAlerta('Error al obtener detalles del usuario', 'danger');
+      }
+    }
+
+    function editarUsuario(userId) {
+      const user = todosLosUsuarios.find(u => u.id === userId);
+      if (!user) return;
+
+      document.getElementById('editUserId').value = user.id;
+      document.getElementById('editNombre').value = user.nombre;
+      document.getElementById('editEmail').value = user.email;
+      
+      abrirModal('editarModal');
+    }
+
+    async function guardarEdicionUsuario() {
+      const userId = document.getElementById('editUserId').value;
+      const nombre = document.getElementById('editNombre').value.trim();
+      const email = document.getElementById('editEmail').value.trim();
+
+      if (!nombre || !email) {
+        mostrarAlerta('Complete todos los campos', 'warning');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/admin/usuarios/${userId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre, email })
+        });
+
+        const data = await res.json();
+        
+        if (!data.success) throw new Error(data.message);
+
+        mostrarAlerta('Usuario actualizado correctamente', 'success');
+        cerrarModal('editarModal');
+        cargarUsuarios();
+      } catch (error) {
+        console.error('Error editando usuario:', error);
+        mostrarAlerta('Error al editar usuario', 'danger');
+      }
+    }
+
+    function eliminarUsuario(userId) {
+      const user = todosLosUsuarios.find(u => u.id === userId);
+      if (!user) return;
+
+      accionPendiente = {
+        tipo: 'eliminar',
+        usuarios: [userId]
+      };
+
+      document.getElementById('confirmTitle').textContent = 'Confirmar Eliminación';
+      document.getElementById('confirmMessage').textContent = 
+        `¿Está seguro que desea eliminar al usuario "${user.nombre}"? Esta acción no se puede deshacer.`;
+      abrirModal('confirmModal');
+    }
+
+    function eliminarSeleccionados() {
+      if (usuariosSeleccionados.length === 0) return;
+
+      accionPendiente = {
+        tipo: 'eliminar',
+        usuarios: [...usuariosSeleccionados]
+      };
+
+      document.getElementById('confirmTitle').textContent = 'Confirmar Eliminación Masiva';
+      document.getElementById('confirmMessage').textContent = 
+        `¿Está seguro que desea eliminar ${usuariosSeleccionados.length} usuario(s)? Esta acción no se puede deshacer.`;
+      abrirModal('confirmModal');
+    }
+
+    function resetearProgreso(userId) {
+      const user = todosLosUsuarios.find(u => u.id === userId);
+      if (!user) return;
+
+      accionPendiente = {
+        tipo: 'resetear',
+        usuarios: [userId]
+      };
+
+      document.getElementById('confirmTitle').textContent = 'Confirmar Reseteo';
+      document.getElementById('confirmMessage').textContent = 
+        `¿Está seguro que desea resetear el progreso de "${user.nombre}"? Se eliminarán todas sus respuestas y certificados.`;
+      document.getElementById('confirmBtn').className = 'btn btn-warning';
+      abrirModal('confirmModal');
+    }
+
+    function resetearSeleccionados() {
+      if (usuariosSeleccionados.length === 0) return;
+
+      accionPendiente = {
+        tipo: 'resetear',
+        usuarios: [...usuariosSeleccionados]
+      };
+
+      document.getElementById('confirmTitle').textContent = 'Confirmar Reseteo Masivo';
+      document.getElementById('confirmMessage').textContent = 
+        `¿Está seguro que desea resetear el progreso de ${usuariosSeleccionados.length} usuario(s)?`;
+      document.getElementById('confirmBtn').className = 'btn btn-warning';
+      abrirModal('confirmModal');
+    }
+
+    async function ejecutarAccion() {
+      if (!accionPendiente) return;
+
+      cerrarModal('confirmModal');
+      
+      try {
+        for (const userId of accionPendiente.usuarios) {
+          if (accionPendiente.tipo === 'eliminar') {
+            await fetch(`${API_BASE}/admin/usuarios/${userId}`, { method: 'DELETE' });
+          } else if (accionPendiente.tipo === 'resetear') {
+            await fetch(`${API_BASE}/admin/usuarios/${userId}/reset`, { method: 'POST' });
+          }
+        }
+
+        usuariosSeleccionados = [];
+        actualizarBulkActions();
+        mostrarAlerta('Acción completada exitosamente', 'success');
+        cargarUsuarios();
+      } catch (error) {
+        console.error('Error ejecutando acción:', error);
+        mostrarAlerta('Error al ejecutar la acción', 'danger');
+      }
+
+      accionPendiente = null;
+      document.getElementById('confirmBtn').className = 'btn btn-danger';
+    }
+
+    // ========================================
+    // GESTIÓN DE EMPLEADOS
+    // ========================================
+    function abrirModalNuevoEmpleado() {
+      document.getElementById('nuevoEmpleadoForm').reset();
+      abrirModal('nuevoEmpleadoModal');
+    }
+
+    async function guardarNuevoEmpleado() {
+      const cedula = document.getElementById('nuevoCedula').value.trim();
+      const nombre = document.getElementById('nuevoNombre').value.trim();
+
+      if (!cedula || !nombre) {
+        mostrarAlerta('Complete todos los campos', 'warning');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/admin/empleados`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cedula, nombre_completo: nombre })
+        });
+
+        const data = await res.json();
+        
+        if (!data.success) throw new Error(data.message);
+
+        mostrarAlerta('Empleado agregado correctamente', 'success');
+        cerrarModal('nuevoEmpleadoModal');
+        cargarEmpleados();
+      } catch (error) {
+        console.error('Error agregando empleado:', error);
+        mostrarAlerta('Error al agregar empleado', 'danger');
+      }
+    }
+
+    async function desactivarEmpleado(cedula) {
+      try {
+        const res = await fetch(`${API_BASE}/admin/empleados/${cedula}/desactivar`, { method: 'PUT' });
+        const data = await res.json();
+        
+        if (!data.success) throw new Error(data.message);
+
+        mostrarAlerta('Empleado desactivado correctamente', 'success');
+        cargarEmpleados();
+      } catch (error) {
+        console.error('Error desactivando empleado:', error);
+        mostrarAlerta('Error al desactivar empleado', 'danger');
+      }
+    }
+
+    async function activarEmpleado(cedula) {
+      try {
+        const res = await fetch(`${API_BASE}/admin/empleados/${cedula}/desactivar`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ estado: 'activo' })
+        });
+        const data = await res.json();
+        
+        if (!data.success) throw new Error(data.message);
+
+        mostrarAlerta('Empleado activado correctamente', 'success');
+        cargarEmpleados();
+      } catch (error) {
+        console.error('Error activando empleado:', error);
+        mostrarAlerta('Error al activar empleado', 'danger');
+      }
+    }
+
+    // ========================================
+    // FILTROS
+    // ========================================
+    function aplicarFiltros() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const estadoFilter = document.getElementById('estadoFilter').value;
+      const fechaInicio = document.getElementById('fechaInicio').value;
+      const fechaFin = document.getElementById('fechaFin').value;
+
+      const filtrados = todosLosUsuarios.filter(user => {
+        const matchSearch = !searchTerm || 
+          user.nombre.toLowerCase().includes(searchTerm) ||
+          user.email.toLowerCase().includes(searchTerm);
+        
+        const matchEstado = !estadoFilter || 
+          user.estado_certificacion === estadoFilter;
+
+        let matchFecha = true;
+        if (fechaInicio && fechaFin) {
+          const fecha = new Date(user.fecha_registro);
+          matchFecha = fecha >= new Date(fechaInicio) && fecha <= new Date(fechaFin);
+        }
+
+        return matchSearch && matchEstado && matchFecha;
+      });
+
+      renderizarTablaUsuarios(filtrados);
+    }
+
+    function limpiarFiltros() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('estadoFilter').value = '';
+      document.getElementById('fechaInicio').value = '';
+      document.getElementById('fechaFin').value = '';
+      renderizarTablaUsuarios(todosLosUsuarios);
+    }
+
+    function aplicarFiltrosEmpleados() {
+      const searchTerm = document.getElementById('searchEmpleado').value.toLowerCase();
+      const estadoFilter = document.getElementById('estadoEmpleadoFilter').value;
+
+      const filtrados = todosLosEmpleados.filter(emp => {
+        const matchSearch = !searchTerm || 
+          emp.nombre_completo.toLowerCase().includes(searchTerm) ||
+          emp.cedula.includes(searchTerm);
+        
+        const matchEstado = !estadoFilter || emp.estado === estadoFilter;
+
+        return matchSearch && matchEstado;
+      });
+
+      renderizarTablaEmpleados(filtrados);
+    }
+
+    // ========================================
+    // SELECCIÓN MASIVA
+    // ========================================
+    function toggleUsuario(userId) {
+      const index = usuariosSeleccionados.indexOf(userId);
+      if (index > -1) {
+        usuariosSeleccionados.splice(index, 1);
+      } else {
+        usuariosSeleccionados.push(userId);
+      }
+      actualizarBulkActions();
+    }
+
+    function toggleSelectAll() {
+      const selectAll = document.getElementById('selectAll').checked;
+      const checkboxes = document.querySelectorAll('.user-checkbox');
+      
+      if (selectAll) {
+        usuariosSeleccionados = todosLosUsuarios.map(u => u.id);
+        checkboxes.forEach(cb => cb.checked = true);
+      } else {
+        usuariosSeleccionados = [];
+        checkboxes.forEach(cb => cb.checked = false);
+      }
+      
+      actualizarBulkActions();
+    }
+
+    function actualizarBulkActions() {
+      const bulkActions = document.getElementById('bulkActions');
+      const selectedCount = document.getElementById('selectedCount');
+      
+      selectedCount.textContent = usuariosSeleccionados.length;
+      
+      if (usuariosSeleccionados.length > 0) {
+        bulkActions.classList.add('active');
+      } else {
+        bulkActions.classList.remove('active');
+      }
+    }
+
+    // ========================================
+    // EXPORTAR CSV
+    // ========================================
+    function exportarCSV() {
+      function escaparCSV(valor) {
+        if (valor === null || valor === undefined) return '';
+        let str = String(valor);
+        if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+          str = str.replace(/"/g, '""');
+          return `"${str}"`;
+        }
+        return str;
+      }
+
+      const headers = [
+        'ID',
+        'Nombre', 
+        'Email',
+        'Modulos_Completados',
+        'Calificacion_Global',
+        'Estado',
+        'Codigo_Certificado',
+        'Fecha_Registro',
+        'Ultima_Actividad'
+      ];
+      
+      const rows = todosLosUsuarios.map(user => {
+        return [
+          user.id,
+          user.nombre,
+          user.email,
+          user.modulos_completados || 0,
+          Math.round(user.calificacion_global || 0),
+          user.estado_certificacion || 'Sin Progreso',
+          user.codigo_verificacion || '',
+          new Date(user.fecha_registro).toLocaleDateString('es-CO'),
+          user.ultima_actividad ? new Date(user.ultima_actividad).toLocaleDateString('es-CO') : ''
+        ].map(escaparCSV);
+      });
+
+      const csv = [
+        headers.join(','),
+        ...rows.map(row => row.join(','))
+      ].join('\r\n');
+
+      const bom = '\uFEFF';
+      const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+      
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      const fecha = new Date().toISOString().split('T')[0];
+      link.setAttribute('href', url);
+      link.setAttribute('download', `usuarios_induccion_${fecha}.csv`);
+      link.style.visibility = 'hidden';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      URL.revokeObjectURL(url);
+
+      mostrarAlerta('CSV exportado exitosamente', 'success');
+    }
+
+    // ========================================
+    // REPORTES
+    // ========================================
+    async function generarReportePeriodo() {
+      const inicio = document.getElementById('reporteInicio').value;
+      const fin = document.getElementById('reporteFin').value;
+
+      if (!inicio || !fin) {
+        mostrarAlerta('Seleccione un rango de fechas', 'warning');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/admin/estadisticas/periodo?inicio=${inicio}&fin=${fin}`);
+        const data = await res.json();
+        
+        if (!data.success) throw new Error(data.message);
+
+        const container = document.getElementById('reporteResultados');
+        
+        if (!data.data || data.data.length === 0) {
+          container.innerHTML = '<div class="chart-container"><p class="empty-state">No hay datos para el período seleccionado</p></div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="chart-container">
+            <h3 class="chart-title">Actividad del Período</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Registros</th>
+                  <th>Certificados</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.data.map(d => `
+                  <tr>
+                    <td>${new Date(d.fecha).toLocaleDateString('es-CO')}</td>
+                    <td>${d.registros}</td>
+                    <td>${d.certificados}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Error generando reporte:', error);
+        mostrarAlerta('Error al generar reporte', 'danger');
+      }
+    }
+
+    async function cargarLogs() {
+      try {
+        const res = await fetch(`${API_BASE}/admin/logs?limit=50`);
+        const data = await res.json();
+        
+        if (!data.success) throw new Error(data.message);
+
+        const container = document.getElementById('logsContainer');
+        
+        if (!data.data || data.data.length === 0) {
+          container.innerHTML = '<p class="empty-state">No hay logs disponibles</p>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Acción</th>
+                <th>Detalles</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.data.map(log => `
+                <tr>
+                  <td>${log.nombre || 'Sistema'}</td>
+                  <td>${log.accion}</td>
+                  <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">${log.detalles || '—'}</td>
+                  <td>${new Date(log.fecha).toLocaleString('es-CO')}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (error) {
+        console.error('Error cargando logs:', error);
+        mostrarAlerta('Error al cargar logs', 'danger');
+      }
+    }
+
+    // ========================================
+    // CONFIGURACIÓN
+    // ========================================
+    function guardarConfiguracion() {
+      const umbral = document.getElementById('umbralAprobacion').value;
+      const preguntas = document.getElementById('preguntasPorModulo').value;
+
+      localStorage.setItem('config_umbral', umbral);
+      localStorage.setItem('config_preguntas', preguntas);
+
+      mostrarAlerta('Configuración guardada correctamente', 'success');
+    }
+
+    function descargarBackup() {
+      window.location.href = `${API_BASE}/admin/backup`;
+      mostrarAlerta('Descargando backup...', 'info');
+    }
+
+    // ========================================
+    // UTILIDADES
+    // ========================================
+    function abrirModal(modalId) {
+      document.getElementById(modalId).classList.add('active');
+    }
+
+    function cerrarModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    function mostrarAlerta(mensaje, tipo) {
+      const container = document.getElementById('alertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${tipo}`;
+      alert.textContent = mensaje;
+      
+      container.appendChild(alert);
+      
+      setTimeout(() => alert.remove(), 5000);
+    }
+
+    // Cerrar modal al hacer click fuera
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal')) {
+        event.target.classList.remove('active');
+      }
+    }
+
+    // Búsqueda en tiempo real
+    document.getElementById('searchInput')?.addEventListener('input', aplicarFiltros);
+    document.getElementById('estadoFilter')?.addEventListener('change', aplicarFiltros);
+    document.getElementById('searchEmpleado')?.addEventListener('input', aplicarFiltrosEmpleados);
+    document.getElementById('estadoEmpleadoFilter')?.addEventListener('change', aplicarFiltrosEmpleados);
+
+    // ========================================
+    // INICIALIZACIÓN
+    // ========================================
+    cargarDashboard();
+
+    // Recargar cada 60 segundos
+    setInterval(() => {
+      const tabActivo = document.querySelector('.tab.active').textContent;
+      if (tabActivo === 'Dashboard') cargarDashboard();
+      if (tabActivo === 'Usuarios') cargarUsuarios();
+      if (tabActivo === 'Empleados') cargarEmpleados();
+    }, 60000);
+  </script>
+</body>
+</html>

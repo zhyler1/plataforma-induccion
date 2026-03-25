@@ -1,0 +1,36 @@
+# Dependencias
+node_modules/
+package-lock.json
+
+# Logs
+*.log
+logs/
+error.log
+combined.log
+security.log
+
+# Variables de entorno (IMPORTANTE - no subir contraseñas)
+.env
+.env.local
+.env.production
+
+# Base de datos local (se creará en servidor)
+*.db
+database.db
+users.db
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Archivos temporales
+tmp/
+temp/
+*.tmp
+
+# Backups
+*.backup
+*.bak
