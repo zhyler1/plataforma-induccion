@@ -4,6 +4,14 @@ const bcrypt = require('bcrypt');
 async function initEmpleados() {
   const db = new Database('./database.db');
   
+  // PRIMERO: Agregar columna si no existe
+  try {
+    db.exec('ALTER TABLE usuarios ADD COLUMN cedula_hash TEXT');
+    console.log('✅ Columna cedula_hash agregada');
+  } catch (error) {
+    console.log('⚠️ Columna cedula_hash ya existe');
+  }
+  
   const count = db.prepare('SELECT COUNT(*) as total FROM usuarios').get();
   
   if (count.total > 0) {
