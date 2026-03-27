@@ -1051,7 +1051,6 @@ async function submitAnswers(mod, idx, container, btn, resDiv) {
 
     // Datos corregidos para el backend
     const requestData = {
-      usuarioEmail: currentUser.email,
       moduloId: mod.id,
       respuestas: respuestasDetalle,
       aciertos: correct,
@@ -1168,7 +1167,6 @@ async function generateCertificate() {
     certBtn.textContent = 'Generando certificado...';
 
     const response = await apiRequest('/certificados/generar', 'POST', {
-      usuarioEmail: currentUser.email
     });
 
     const certificateData = response.data;
