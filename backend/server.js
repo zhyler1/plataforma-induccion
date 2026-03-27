@@ -491,7 +491,7 @@ app.post('/api/modulos/respuesta',
     try {
       db.prepare(`
         INSERT INTO respuestas_modulos 
-        (usuario_id, modulo_id, respuestas, aciertos, total_preguntas, porcentaje) 
+        (usuario_id, modulo_id, respuestas_json, aciertos, total_preguntas, porcentaje) 
         VALUES (?, ?, ?, ?, ?, ?)
       `).run(req.usuario.id, moduloId, JSON.stringify(respuestas), aciertos, totalPreguntas, porcentaje);
 
