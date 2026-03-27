@@ -218,6 +218,29 @@ function initializeDatabase() {
       logger.info('✅ Módulos inicializados');
     }
 
+    // === MIGRACIONES AUTOMÁTICAS ===
+    // Agrega columnas que puedan faltar en BDs antiguas (ej. Render con BD en caché)
+    const migraciones = [
+      {
+        tabla: 'progreso_usuarios',
+        columna: 'porcentaje_progreso',
+        sql: 'ALTER TABLE progreso_usuarios ADD COLUMN porcentaje_progreso REAL DEFAULT 0'
+      }
+    ];
+
+    for (const m of migraciones) {
+      try {
+        const cols = db.pragma(`table_info(${m.tabla})`);
+        const existe = cols.some(c => c.name === m.columna);
+        if (!existe) {
+          db.exec(m.sql);
+          logger.info(`✅ Migración aplicada: ${m.tabla}.${m.columna}`);
+        }
+      } catch (migError) {
+        logger.warn(`⚠️ Migración ${m.tabla}.${m.columna}: ${migError.message}`);
+      }
+    }
+
     logger.info('✅ Base de datos inicializada');
   } catch (error) {
     logger.error('❌ Error inicializando BD:', error);
@@ -489,9 +512,10 @@ app.post('/api/modulos/respuesta',
     const { moduloId, respuestas, aciertos, totalPreguntas, porcentaje } = req.body;
 
     try {
+      // Guardar respuesta (INSERT OR REPLACE por si el usuario repite el módulo)
       db.prepare(`
-        INSERT INTO respuestas_modulos 
-        (usuario_id, modulo_id, respuestas_json, aciertos, total_preguntas, porcentaje) 
+        INSERT OR REPLACE INTO respuestas_modulos 
+        (usuario_id, modulo_id, respuestas, aciertos, total_preguntas, porcentaje) 
         VALUES (?, ?, ?, ?, ?, ?)
       `).run(req.usuario.id, moduloId, JSON.stringify(respuestas), aciertos, totalPreguntas, porcentaje);
 
@@ -512,12 +536,18 @@ app.post('/api/modulos/respuesta',
         ? (calificacionGlobal >= 80 ? 'Aprobado' : 'Reprobado')
         : 'En Progreso';
 
+      // INSERT OR REPLACE garantiza que el registro exista aunque sea nuevo usuario
       db.prepare(`
-        UPDATE progreso_usuarios 
-        SET modulos_completados = ?, calificacion_global = ?, porcentaje_progreso = ?,
-            estado_certificacion = ?, fecha_actualizacion = CURRENT_TIMESTAMP
-        WHERE usuario_id = ?
-      `).run(modulosCompletados, calificacionGlobal, porcentajeProgreso, estadoCertificacion, req.usuario.id);
+        INSERT INTO progreso_usuarios 
+          (usuario_id, modulos_completados, calificacion_global, porcentaje_progreso, estado_certificacion, fecha_actualizacion)
+        VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(usuario_id) DO UPDATE SET
+          modulos_completados = excluded.modulos_completados,
+          calificacion_global = excluded.calificacion_global,
+          porcentaje_progreso = excluded.porcentaje_progreso,
+          estado_certificacion = excluded.estado_certificacion,
+          fecha_actualizacion = CURRENT_TIMESTAMP
+      `).run(req.usuario.id, modulosCompletados, calificacionGlobal, porcentajeProgreso, estadoCertificacion);
 
       const progreso = db.prepare('SELECT * FROM progreso_usuarios WHERE usuario_id = ?')
         .get(req.usuario.id);
