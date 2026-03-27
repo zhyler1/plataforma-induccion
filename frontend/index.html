@@ -636,7 +636,7 @@
   <section id="login" class="fade-in">
     <h2>¡Bienvenido!</h2>
     <form id="form">
-      <input id="name" name="name" type="text" placeholder="Nombre completo" required>
+      <input id="loginEmail" name="email" type="email" placeholder="usuario@presidencia.gov.co" required>
       <input id="cedula" name="cedula" type="text" placeholder="Número de cédula" required pattern="[0-9]+" title="Solo números">
       <button type="submit" class="btn-login">
         <span id="loginText">Ingresar a la plataforma</span>
@@ -1343,7 +1343,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ========================
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById("loginEmail").value.trim();
     const cedula = document.getElementById('cedula').value.trim();
     const loginText = document.getElementById('loginText');
     const loginLoading = document.getElementById('loginLoading');
@@ -1371,7 +1371,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: name.toUpperCase(), password: cedula })
+        body: JSON.stringify({ email: email.toUpperCase(), password: cedula })
       });
 
       const data = await response.json();
