@@ -110,7 +110,7 @@ const loginLimiter = rateLimit({
 // ==========================================
 // BASE DE DATOS
 // ==========================================
-const dbPath = process.env.DB_PATH || './database.db';
+const dbPath = process.env.DB_PATH || './database_v2.db';
 let db;
 
 try {
