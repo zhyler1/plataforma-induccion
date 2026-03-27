@@ -220,7 +220,6 @@ function initializeDatabase() {
     }
 
     // === MIGRACIONES AUTOMÁTICAS ===
-    // Necesario para BDs antiguas en Render que no tienen todas las columnas
     const migraciones = [
       {
         tabla: 'progreso_usuarios',
@@ -557,8 +556,8 @@ app.post('/api/modulos/respuesta',
 
     } catch (error) {
       logger.error('Error guardando respuesta:', error);
-      res.status(500).json({ success: false, error: error.message, code: error.code
-    
+      res.status(500).json({ success: false, error: error.message, code: error.code });
+    }
   }
 );
 
@@ -609,7 +608,7 @@ app.post('/api/certificados/generar', verificarToken, async (req, res) => {
 });
 
 // ==========================================
-// RUTAS ESTÁTICAS
+// RUTAS ESTÁTICAS Y DEBUG
 // ==========================================
 
 app.get('/api/debug', (req, res) => {
@@ -624,6 +623,10 @@ app.get('/api/debug', (req, res) => {
 
 app.use(express.static(path.join(__dirname, '../frontend')));
 app.use('/admin', express.static(path.join(__dirname, '../admin')));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
 
 // ==========================================
 // INICIO DEL SERVIDOR
