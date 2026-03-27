@@ -557,8 +557,8 @@ app.post('/api/modulos/respuesta',
 
     } catch (error) {
       logger.error('Error guardando respuesta:', error);
-      res.status(500).json({ success: false });
-    }
+      res.status(500).json({ success: false, error: error.message, code: error.code
+    
   }
 );
 
