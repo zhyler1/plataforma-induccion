@@ -153,13 +153,14 @@ function initializeDatabase() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         usuario_id INTEGER NOT NULL,
         modulo_id INTEGER NOT NULL,
-        respuestas TEXT NOT NULL,
+        respuestas_json TEXT NOT NULL,
         aciertos INTEGER NOT NULL,
         total_preguntas INTEGER NOT NULL,
         porcentaje REAL NOT NULL,
         fecha_respuesta DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-        FOREIGN KEY (modulo_id) REFERENCES modulos(id) ON DELETE CASCADE
+        FOREIGN KEY (modulo_id) REFERENCES modulos(id) ON DELETE CASCADE,
+        UNIQUE(usuario_id, modulo_id)
       )
     `);
 
@@ -219,7 +220,7 @@ function initializeDatabase() {
     }
 
     // === MIGRACIONES AUTOMÁTICAS ===
-    // Agrega columnas que puedan faltar en BDs antiguas (ej. Render con BD en caché)
+    // Necesario para BDs antiguas en Render que no tienen todas las columnas
     const migraciones = [
       {
         tabla: 'progreso_usuarios',
@@ -512,10 +513,10 @@ app.post('/api/modulos/respuesta',
     const { moduloId, respuestas, aciertos, totalPreguntas, porcentaje } = req.body;
 
     try {
-      // Guardar respuesta (INSERT OR REPLACE por si el usuario repite el módulo)
+      // INSERT OR REPLACE por si el usuario repite el módulo
       db.prepare(`
         INSERT OR REPLACE INTO respuestas_modulos 
-        (usuario_id, modulo_id, respuestas, aciertos, total_preguntas, porcentaje) 
+        (usuario_id, modulo_id, respuestas_json, aciertos, total_preguntas, porcentaje) 
         VALUES (?, ?, ?, ?, ?, ?)
       `).run(req.usuario.id, moduloId, JSON.stringify(respuestas), aciertos, totalPreguntas, porcentaje);
 
@@ -536,7 +537,7 @@ app.post('/api/modulos/respuesta',
         ? (calificacionGlobal >= 80 ? 'Aprobado' : 'Reprobado')
         : 'En Progreso';
 
-      // INSERT OR REPLACE garantiza que el registro exista aunque sea nuevo usuario
+      // Upsert: crea el registro si no existe, actualiza si sí existe
       db.prepare(`
         INSERT INTO progreso_usuarios 
           (usuario_id, modulos_completados, calificacion_global, porcentaje_progreso, estado_certificacion, fecha_actualizacion)

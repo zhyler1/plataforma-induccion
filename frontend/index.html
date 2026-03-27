@@ -896,13 +896,23 @@ function updateStats() {
   }
 
   const totalModules = modulesData.length;
-  const completedCount = Object.keys(userProgress.modulos_completados || {}).length;
+const completedCount = typeof userProgress.modulos_completados === 'number' 
+  ? userProgress.modulos_completados 
+  : Object.keys(userProgress.modulos_completados || {}).length;
   const globalPct = Math.round(userProgress.calificacion_global || 0);
   
   // Actualizar elementos del DOM
   document.getElementById('globalScore').textContent = `${globalPct}%`;
   document.getElementById('completedModules').textContent = `${completedCount}/${totalModules}`;
   document.getElementById('certStatus').textContent = globalPct >= 80 ? '✅' : '❌';
+
+  // Mostrar/ocultar sección de certificado
+  const certDiv = document.getElementById('cert');
+  if (globalPct >= 80 && completedCount >= totalModules) {
+    certDiv.classList.remove('hidden');
+  } else {
+    certDiv.classList.add('hidden');
+  }
   
   // Actualizar barra de progreso
   const progressPercent = (completedCount / totalModules) * 100;
@@ -1149,6 +1159,7 @@ function unlockNextModule(idx) {
 // ========================
 function checkCompletionAndEnableCert() {
   const certBtn = document.getElementById('certBtn');
+  certBtn.addEventListener('click', generateCertificate);
   const globalPct = userProgress.calificacion_global || 0;
 
   if (globalPct >= 80) {
