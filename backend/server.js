@@ -612,12 +612,18 @@ app.post('/api/certificados/generar', verificarToken, async (req, res) => {
 // RUTAS ESTÁTICAS
 // ==========================================
 
+app.get('/api/debug', (req, res) => {
+  try {
+    const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
+    const cols = db.pragma('table_info(respuestas_modulos)');
+    res.json({ tables, cols_respuestas_modulos: cols });
+  } catch(e) {
+    res.json({ error: e.message });
+  }
+});
+
 app.use(express.static(path.join(__dirname, '../frontend')));
 app.use('/admin', express.static(path.join(__dirname, '../admin')));
-
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/index.html'));
-});
 
 // ==========================================
 // INICIO DEL SERVIDOR
