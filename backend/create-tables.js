@@ -17,5 +17,13 @@ db.exec(`
   );
 `);
 
-console.log('✅ Tabla respuestas_modulos creada');
+// Agregar columna porcentaje_progreso si no existe
+try {
+  db.exec('ALTER TABLE progreso_usuarios ADD COLUMN porcentaje_progreso DECIMAL(5,2) DEFAULT 0');
+  console.log('✅ Columna porcentaje_progreso agregada');
+} catch(e) {
+  console.log('⚠️ Columna porcentaje_progreso ya existe');
+}
+
+console.log('✅ Tablas verificadas');
 db.close();
