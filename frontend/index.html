@@ -169,120 +169,62 @@
       font-weight: 500;
     }
 
-    /* AUTH CONTAINER - NUEVO */
-    .auth-container {
-      max-width: 500px;
-      margin: 3rem auto;
+    /* Login */
+    #login {
+      text-align: center;
+      padding: 3rem;
       background: rgba(255, 255, 255, 0.95);
-      padding: 2rem;
+      max-width: 450px;
+      margin: 3rem auto;
       border-radius: var(--border-radius);
       box-shadow: var(--shadow-lg);
       backdrop-filter: blur(10px);
     }
 
-    .auth-tabs {
-      display: flex;
-      gap: 1rem;
+    #login h2 {
+      color: var(--primary-blue);
       margin-bottom: 2rem;
-      border-bottom: 2px solid var(--gray-100);
+      font-size: 2rem;
+      font-weight: 700;
     }
 
-    .tab-btn {
-      flex: 1;
-      padding: 1rem;
-      background: none;
-      border: none;
-      border-bottom: 3px solid transparent;
-      cursor: pointer;
-      font-weight: 600;
-      color: var(--gray-500);
-      transition: var(--transition);
-      font-family: 'Montserrat', sans-serif;
-    }
-
-    .tab-btn.active {
-      color: var(--primary-blue);
-      border-bottom-color: var(--primary-blue);
-    }
-
-    .tab-btn:hover {
-      color: var(--primary-blue-light);
-    }
-
-    .auth-form {
-      animation: fadeIn 0.3s;
-    }
-
-    .auth-form h3 {
-      text-align: center;
-      color: var(--primary-blue);
-      margin-bottom: 1.5rem;
-      font-size: 1.5rem;
-    }
-
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-      color: var(--gray-700);
-    }
-
-    .form-group input {
+    #login input {
       width: 100%;
-      padding: 0.75rem;
-      border: 2px solid var(--gray-100);
-      border-radius: 8px;
+      padding: 1rem;
+      margin: 0.75rem 0;
       font-size: 1rem;
+      border: 2px solid var(--gray-100);
+      border-radius: var(--border-radius);
       transition: var(--transition);
-      font-family: 'Montserrat', sans-serif;
+      font-family: inherit;
     }
 
-    .form-group input:focus {
+    #login input:focus {
       outline: none;
       border-color: var(--primary-blue);
       box-shadow: 0 0 0 4px rgba(65, 102, 197, 0.1);
     }
 
-    .form-group small {
-      display: block;
-      margin-top: 0.25rem;
-      color: var(--gray-500);
-      font-size: 0.875rem;
-    }
-
-    .error-message {
-      color: var(--danger-red);
-      padding: 0.75rem;
-      background: rgba(239, 68, 68, 0.1);
-      border-radius: 8px;
-      margin-top: 1rem;
-      font-size: 0.9rem;
-    }
-
-    .btn-primary {
+    .btn-login {
       width: 100%;
       padding: 1rem;
       background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: var(--border-radius);
+      font-size: 1.1rem;
       font-weight: 600;
       cursor: pointer;
+      margin-top: 1.5rem;
       transition: var(--transition);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 1.1rem;
     }
 
-    .btn-primary:hover {
+    .btn-login:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow-lg);
     }
 
-    .btn-primary:disabled {
+    .btn-login:disabled {
       background: var(--gray-500);
       cursor: not-allowed;
       transform: none;
@@ -631,10 +573,6 @@
       header {
         padding: 1rem;
       }
-      
-      .auth-container {
-        margin: 2rem 1rem;
-      }
     }
   </style>
 </head>
@@ -694,48 +632,19 @@
     </p>
   </div>
 
-  <!-- FORMULARIOS DE AUTH - ACTUALIZADO -->
-  <div id="authContainer" class="auth-container fade-in">
-    <div class="auth-tabs">
-      <button class="tab-btn active" onclick="mostrarLogin()">Iniciar Sesión</button>
-      <button class="tab-btn" onclick="mostrarRegistro()">Registrarse</button>
-    </div>
-
-    <!-- FORMULARIO LOGIN -->
-    <form id="loginForm" class="auth-form">
-      <h3>Iniciar Sesión</h3>
-      <div class="form-group">
-        <label>Email Institucional</label>
-        <input type="email" id="loginEmail" placeholder="usuario@presidencia.gov.co" required>
-      </div>
-      <div class="form-group">
-        <label>Cédula</label>
-        <input type="text" id="loginCedula" placeholder="12345678" required pattern="[0-9]+">
-      </div>
-      <button type="submit" class="btn-primary">Ingresar</button>
-      <p id="loginError" class="error-message hidden"></p>
+  <!-- Formulario de login -->
+  <section id="login" class="fade-in">
+    <h2>¡Bienvenido!</h2>
+    <form id="form">
+      <input id="name" name="name" type="text" placeholder="Nombre completo" required>
+      <input id="cedula" name="cedula" type="text" placeholder="Número de cédula" required pattern="[0-9]+" title="Solo números">
+      <button type="submit" class="btn-login">
+        <span id="loginText">Ingresar a la plataforma</span>
+        <span id="loginLoading" class="loading hidden"></span>
+      </button>
+      <div id="loginError" style="color: red; margin-top: 1rem; display: none;"></div>
     </form>
-
-    <!-- FORMULARIO REGISTRO -->
-    <form id="registroForm" class="auth-form hidden">
-      <h3>Registro de Usuario</h3>
-      <div class="form-group">
-        <label>Email Institucional *</label>
-        <input type="email" id="registroEmail" placeholder="usuario@presidencia.gov.co" required>
-        <small>Solo correos @presidencia.gov.co</small>
-      </div>
-      <div class="form-group">
-        <label>Nombre Completo *</label>
-        <input type="text" id="registroNombre" placeholder="JUAN PÉREZ" required>
-      </div>
-      <div class="form-group">
-        <label>Cédula *</label>
-        <input type="text" id="registroCedula" placeholder="12345678" required pattern="[0-9]+">
-      </div>
-      <button type="submit" class="btn-primary">Registrarse</button>
-      <p id="registroError" class="error-message hidden"></p>
-    </form>
-  </div>
+  </section>
 
   <!-- Contenedor de módulos -->
   <div id="modules"></div>
@@ -751,15 +660,20 @@
 
   <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+
   <script>
 // CONFIGURACIÓN GLOBAL
+// ========================
 const API_BASE_URL = '/api';
 let currentUser = null;
 let userProgress = {};
 let startTime = null;
 let timeInterval = null;
 
-// DATOS DE MÓDULOS (mismos 11 módulos...)
+// ========================
+// DATOS DE MÓDULOS
+// ========================
 const modulesData = [
   {
     id: 1,
@@ -774,13 +688,186 @@ const modulesData = [
       { texto: '¿En qué año fue creada la Casa de Nariño?', opciones: ['1754','1918','1885'], correcta: '1918' },
       { texto: '¿Formación académica del Presidente?', opciones: ['Derecho','Economía y ambiente','Ingeniería'], correcta: 'Economía y ambiente' }
     ]
+  },
+  {
+    id: 2,
+    titulo: 'Puntos de Encuentro',
+    video: 'https://media.presidencia.gov.co/Intranet/th/Induccion_2025/puntos%20de%20encuentro.mp4',
+    imagen: 'https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/puntos.jpg',
+    preguntas: [
+      { texto: '¿Finalidad de puntos de encuentro?', opciones: ['Evitar tráfico','Evacuación','Recreación'], correcta: 'Evacuación' },
+      { texto: '¿Al llegar a un punto de encuentro?', opciones: ['Esperar','Fotografiar','Volver'], correcta: 'Esperar' },
+      { texto: '¿Quién coordina evacuaciones?', opciones: ['Guardia','Brigadistas','Talento Humano'], correcta: 'Brigadistas' },
+      { texto: '¿Ubicación de puntos de encuentro?', opciones: ['Salidas','Sótanos','Baños'], correcta: 'Salidas' },
+      { texto: '¿Acción incorrecta en evacuación?', opciones: ['Calma','Correr','Seguir'], correcta: 'Correr' },
+      { texto: '¿Otra función de puntos de encuentro?', opciones: ['Refrigerios','Verificar','Videos'], correcta: 'Verificar' }
+    ]
+  },
+  {
+    id: 3,
+    titulo: "Talento Humano",
+    video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/TH.mp4",
+    imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/talento_humano.jpg",
+    preguntas: [
+      { texto: "¿Cuál es el objetivo del Área de Talento Humano?", opciones: ["Gestionar recursos físicos", "Brindar bienestar y fortalecer competencias laborales", "Administrar contratos y licitaciones"], correcta: "Brindar bienestar y fortalecer competencias laborales" },
+      { texto: "¿Qué grupo gestiona las vacaciones y licencias?", opciones: ["Seguridad y Salud en el Trabajo", "Nómina", "Gestión de Personal"], correcta: "Nómina" },
+      { texto: "¿Qué espacio se ofrece a las madres lactantes?", opciones: ["Comedor", "Sala Amiga", "Consultorio médico"], correcta: "Sala Amiga" },
+      { texto: "¿Cuál de estos es un beneficio mencionado en el módulo?", opciones: ["Auto asignación de vacaciones", "Horario flexible", "Viajes internacionales"], correcta: "Horario flexible" },
+      { texto: "¿Qué canal se menciona para conocer noticias institucionales?", opciones: ["Periódico local", "Boletín Digital Entérate", "Red social externa"], correcta: "Boletín Digital Entérate" },
+      { texto: "¿Cuál es el objetivo estratégico del DAPRE en comunicación interna?", opciones: ["Promocionar productos", "Afianzar comunicación con lineamientos claros e información de calidad", "Publicar notas de prensa"], correcta: "Afianzar comunicación con lineamientos claros e información de calidad" }
+    ]
+  },
+  {
+    id: 4,
+    titulo: "Seguridad y Salud en el Trabajo",
+    video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/sst.mp4",
+    imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/sst.jpg",
+    preguntas: [
+      { texto: "¿Cuál es el propósito del Sistema de Gestión de SST?", opciones: ["Aumentar la carga laboral", "Promover el bienestar físico, mental y social", "Disminuir sueldos"], correcta: "Promover el bienestar físico, mental y social" },
+      { texto: "¿Qué busca la política de no alcohol y drogas?", opciones: ["Promover ambiente sano", "Incrementar consumo de sedantes", "Permitir tabaco en áreas comunes"], correcta: "Promover ambiente sano" },
+      { texto: "¿Cómo se identifican los brigadistas?", opciones: ["Con gorras azules", "Con chalecos rojos", "Con camisas blancas"], correcta: "Con chalecos rojos" },
+      { texto: "¿Qué número es la línea de emergencias del DAPRE?", opciones: ["123", "2299", "911"], correcta: "2299" },
+      { texto: "¿Qué incluye la definición de accidente de trabajo?", opciones: ["Solo lesiones físicas", "Eventos en traslados y actividades culturales", "Solo accidentes viales"], correcta: "Eventos en traslados y actividades culturales" },
+      { texto: "¿Qué se fortalece con la política de seguridad vial?", opciones: ["Autocuidado en movilidad", "Conducción sin casco", "Uso de motos sin licencia"], correcta: "Autocuidado en movilidad" }
+    ]
+  },
+  {
+    id: 5,
+    titulo: "Dirección Administrativa y Financiera (DAF)",
+    video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/DAF.mp4",
+    imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/daf.jpg",
+    preguntas: [
+      { texto: "¿Qué áreas dependen de la DAF?", opciones: ["Talento Humano y Planeación", "Área Administrativa, Contratos y Financiera", "SST y Sistemas"], correcta: "Área Administrativa, Contratos y Financiera" },
+      { texto: "¿Qué función cumple el Área de Contratos?", opciones: ["Auditorías internas", "Procesos en SECOP II", "Gestión de nómina"], correcta: "Procesos en SECOP II" },
+      { texto: "¿Qué grupo elabora los estados financieros?", opciones: ["Grupo de Contabilidad", "Grupo de Presupuesto", "Grupo de Pagaduría"], correcta: "Grupo de Contabilidad" },
+      { texto: "¿Qué hace el Grupo de Pagaduría?", opciones: ["Control disciplinario", "Ordenes de pago y comisiones", "Contratación externa"], correcta: "Ordenes de pago y comisiones" },
+      { texto: "¿Cuál es una función del Grupo de Presupuesto?", opciones: ["Elabora registros presupuestales", "Realiza eventos institucionales", "Administra biblioteca"], correcta: "Elabora registros presupuestales" },
+      { texto: "¿Cuál es el rol del Área Administrativa?", opciones: ["Servicios administrativos y logísticos", "Desarrollo de software", "Gestión de emergencias"], correcta: "Servicios administrativos y logísticos" }
+    ]
+  },
+  {
+    id: 6,
+    titulo: "Sistemas y Tecnologías de la Información",
+    video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/sistemas.mp4",
+    imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/sistemas.jpg",
+    preguntas: [
+      { texto: "¿Qué mejora el área de Sistemas?", opciones: ["Publicidad", "Integridad, disponibilidad y confidencialidad de las TIC", "Contratos"], correcta: "Integridad, disponibilidad y confidencialidad de las TIC" },
+      { texto: "¿Qué hace el Grupo de Telecomunicaciones?", opciones: ["Gestiona roaming y soporte celular", "Desarrolla software", "Auditorías externas"], correcta: "Gestiona roaming y soporte celular" },
+      { texto: "¿Cuál es la función del Grupo de Red?", opciones: ["Diseñar redes y comunicaciones", "Atención al público", "Seguridad física"], correcta: "Diseñar redes y comunicaciones" },
+      { texto: "¿Qué garantiza el Grupo de Plataforma TI?", opciones: ["Ambientes separados y alta disponibilidad", "Gestión de nómina", "Planeación estratégica"], correcta: "Ambientes separados y alta disponibilidad" },
+      { texto: "¿Qué hace el Grupo de Soporte de TI y Mesa de Ayuda?", opciones: ["Garantizar disponibilidad de servicios tecnológicos", "Supervisar contratos", "Mantener archivos físicos"], correcta: "Garantizar disponibilidad de servicios tecnológicos" },
+      { texto: "¿Cuál es la tarea del Grupo de Desarrollo de Software?", opciones: ["Implementar y mantener software institucional", "Organizar eventos", "Gestionar licencias"], correcta: "Implementar y mantener software institucional" }
+    ]
+  },
+  {
+    id: 7,
+    titulo: "Control Interno Disciplinario",
+    video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/ctrl%20interno%20disciplinario.mp4",
+    imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/ctrl_disciplinario.jpg",
+    preguntas: [
+      { texto: "¿Cuál es el objetivo de Control Interno Disciplinario?", opciones: ["Capacitar personal", "Investigar y sancionar faltas", "Gestionar presupuestos"], correcta: "Investigar y sancionar faltas" },
+      { texto: "¿Qué normativa rige estos procesos?", opciones: ["Ley 734 de 2002", "Ley 80 de 1993", "Ley 19 de 2018"], correcta: "Ley 734 de 2002" },
+      { texto: "¿Qué promueven para prevenir faltas?", opciones: ["Sanciones inmediatas", "Talleres de sensibilización", "Reuniones gerenciales"], correcta: "Talleres de sensibilización" },
+      { texto: "¿Qué actitud busca fomentar?", opciones: ["Desinterés", "Respeto y cumplimiento de deberes", "Competitividad"], correcta: "Respeto y cumplimiento de deberes" },
+      { texto: "¿Qué ocurre ante denuncias de corrupción?", opciones: ["Se archiva", "Se investiga en tiempo real", "Se traslada a otra entidad"], correcta: "Se investiga en tiempo real" },
+      { texto: "¿Cuál es la finalidad de sancionar faltas?", opciones: ["Despedir funcionarios", "Combatir corrupción", "Evaluar desempeño"], correcta: "Combatir corrupción" }
+    ]
+  },
+  {
+    id: 8,
+    titulo: "Oficina de Planeación",
+    video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/planeacion.mp4",
+    imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/planeacion.jpg",
+    preguntas: [
+      { texto: "¿Qué administra la Oficina de Planeación?", opciones: ["SIGEPRE", "SECOP", "SIRECI"], correcta: "SIGEPRE" },
+      { texto: "¿Qué busca SIGEPRE?", opciones: ["Auditorías externas", "Armonizar procesos eficientes", "Capacitar líderes"], correcta: "Armonizar procesos eficientes" },
+      { texto: "¿Qué consolida para rendición de cuentas?", opciones: ["Plan de Bienestar", "Informe al Congreso", "Acta de Junta"], correcta: "Informe al Congreso" },
+      { texto: "¿Qué tipo de planeación lidera?", opciones: ["Estrategica y operativa", "Jurídica y financiera", "Cultural y deportiva"], correcta: "Estrategica y operativa" },
+      { texto: "¿Con quién coordina para apoyar al Presidente?", opciones: ["Sector privado", "Entidades públicas y privadas", "Medios de comunicación"], correcta: "Entidades públicas y privadas" },
+      { texto: "¿Qué mejora con el SIG integrado?", opciones: ["Solo finanzas", "Satisfacción de clientes", "Solo RRHH"], correcta: "Satisfacción de clientes" }
+    ]
+  },
+  {
+    id: 9,
+    titulo: "Oficina de Control Interno",
+    video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/control_interno.mp4",
+    imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/control_interno.jpg",
+    preguntas: [
+      { texto: "¿Cuál es el propósito de Control Interno?", opciones: ["Sancionar funcionarios", "Asesorar e implementar SIG", "Organizar eventos"], correcta: "Asesorar e implementar SIG" },
+      { texto: "¿Qué garantiza este SIG?", opciones: ["Decisiones oportunas", "Capacitación técnica", "Publicidad institucional"], correcta: "Decisiones oportunas" },
+      { texto: "¿Qué evalúa esta oficina?", opciones: ["Riesgos financieros", "Mejoramiento del SIG", "Plan de Comunicación"], correcta: "Mejoramiento del SIG" },
+      { texto: "¿Cuál es una acción clave de Control Interno?", opciones: ["Auditorías externas", "Capacitaciones obligatorias", "Definir políticas de contratación"], correcta: "Capacitaciones obligatorias" },
+      { texto: "¿Contra qué direccionamiento estratégico trabaja?", opciones: ["Gobierno digital", "Direccionamiento estratégico de la entidad", "Planeación municipal"], correcta: "Direccionamiento estratégico de la entidad" },
+      { texto: "¿Qué apoya en la toma de decisiones?", opciones: ["Informe al Congreso", "SIG integrado", "Comités técnicos"], correcta: "SIG integrado" }
+    ]
+  },
+  {
+    id: 10,
+    titulo: "Relacionamiento con el Ciudadano",
+    video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/relacionamiento.mp4",
+    imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/ciudadano.jpg",
+    preguntas: [
+      { texto: "¿Qué atiende el Grupo de Atención a la Ciudadanía?", opciones: ["Eventos institucionales", "Requerimientos internos y externos", "Auditorías internas"], correcta: "Requerimientos internos y externos" },
+      { texto: "¿Qué gestiona en documentos?", opciones: ["Archivo histórico", "Radicación y remisión por competencias", "Traducciones oficiales"], correcta: "Radicación y remisión por competencias" },
+      { texto: "¿Qué busca garantizar?", opciones: ["Eficiencia financiera", "Prestación oportuna de servicios", "Desarrollo tecnológico"], correcta: "Prestación oportuna de servicios" },
+      { texto: "¿Qué canales utiliza?", opciones: ["Solo presenciales", "Internos y externos", "Solo digitales"], correcta: "Internos y externos" },
+      { texto: "¿Qué competencia aplica?", opciones: ["Competencia territorial", "Competencia por funciones", "Competencia internacional"], correcta: "Competencia por funciones" },
+      { texto: "¿Qué medio emplea para seguimiento?", opciones: ["Buzón físico", "Sistema de PQRS", "Llamadas telefónicas"], correcta: "Sistema de PQRS" }
+    ]
+  },
+  {
+    id: 11,
+    titulo: "Recorrido por el Palacio",
+    video: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/recorrido.mp4",
+    imagen: "https://media.presidencia.gov.co/Intranet/th/Induccion_2025/imagenes/recorrido.jpg",
+    preguntas: [
+      { texto: "¿Dónde ocurre el cambio de guardia?", opciones: ["Salón Virreinal", "Plaza de Armas", "Salón Independencia"], correcta: "Plaza de Armas" },
+      { texto: "¿Qué colegio está junto al Capitolio?", opciones: ["San Bartolomé", "San Carlos", "San Ignacio"], correcta: "San Bartolomé" },
+      { texto: "¿Quién construyó el Capitolio Nacional?", opciones: ["Francisco de Paula Santander", "Tomás Cipriano de Mosquera y Thomas Reed", "Antonio Nariño"], correcta: "Tomás Cipriano de Mosquera y Thomas Reed" },
+      { texto: "¿Qué objeto regaló Francia?", opciones: ["Candelabro de baccarat", "Jarrón de porcelana Fausto de Santi Blum", "Mesa Napoleón"], correcta: "Jarrón de porcelana Fausto de Santi Blum" },
+      { texto: "¿Qué elemento embalsamó el artista en el Salón Virreinal?", opciones: ["Un ave", "Un insecto", "Un mamífero"], correcta: "Un insecto" },
+      { texto: "¿Dónde se exhibe la espada de Bolívar?", opciones: ["Galería Expresiva", "Galería Godino", "Salón Colombia"], correcta: "Galería Expresiva" }
+    ]
   }
-  // ... (resto de módulos - igual que el original)
 ];
 
-// ========================================
+// ========================
+// FUNCIONES DE API
+// ========================
+async function apiRequest(endpoint, method = 'GET', data = null) {
+  try {
+    const options = {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    if (data) {
+      options.body = JSON.stringify(data);
+    }
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Error en la petición');
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error en API:', error);
+    throw error;
+  }
+}
+
+// ========================
 // FUNCIONES DE UTILIDAD
-// ========================================
+// ========================
+function emailValido(email) {
+  return email.toLowerCase().endsWith('@presidencia.gov.co');
+}
+
 function showNotification(message, type = 'info') {
   const notification = document.createElement('div');
   notification.className = 'notification';
@@ -799,128 +886,632 @@ function showNotification(message, type = 'info') {
   setTimeout(() => notification.remove(), 4000);
 }
 
-// ========================================
-// CAMBIAR ENTRE LOGIN Y REGISTRO
-// ========================================
-function mostrarLogin() {
-  document.getElementById('loginForm').classList.remove('hidden');
-  document.getElementById('registroForm').classList.add('hidden');
-  document.querySelectorAll('.tab-btn')[0].classList.add('active');
-  document.querySelectorAll('.tab-btn')[1].classList.remove('active');
-}
+function updateStats() {
+  if (!userProgress) {
+    userProgress = {
+      modulos_completados: {},
+      calificacion_global: 0,
+      porcentaje_progreso: 0
+    };
+  }
 
-function mostrarRegistro() {
-  document.getElementById('loginForm').classList.add('hidden');
-  document.getElementById('registroForm').classList.remove('hidden');
-  document.querySelectorAll('.tab-btn')[0].classList.remove('active');
-  document.querySelectorAll('.tab-btn')[1].classList.add('active');
-}
-
-// ========================================
-// MANEJO DE REGISTRO
-// ========================================
-document.getElementById('registroForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
+  const totalModules = modulesData.length;
+  const completedCount = Object.keys(userProgress.modulos_completados || {}).length;
+  const globalPct = Math.round(userProgress.calificacion_global || 0);
   
-  const email = document.getElementById('registroEmail').value.trim();
-  const nombre = document.getElementById('registroNombre').value.trim();
-  const cedula = document.getElementById('registroCedula').value.trim();
-  const errorMsg = document.getElementById('registroError');
+  // Actualizar elementos del DOM
+  document.getElementById('globalScore').textContent = `${globalPct}%`;
+  document.getElementById('completedModules').textContent = `${completedCount}/${totalModules}`;
+  document.getElementById('certStatus').textContent = globalPct >= 80 ? '✅' : '❌';
+  
+  // Actualizar barra de progreso
+  const progressPercent = (completedCount / totalModules) * 100;
+  document.getElementById('progressFill').style.width = `${progressPercent}%`;
+  document.getElementById('progressText').textContent = `Progreso: ${Math.round(progressPercent)}% (${completedCount}/${totalModules} módulos completados)`;
+  
+  // Actualizar tiempo
+  if (startTime) {
+    const elapsed = Math.floor((Date.now() - startTime) / 60000);
+    document.getElementById('timeSpent').textContent = `${elapsed}min`;
+  }
+}
 
-  if (!email.endsWith('@presidencia.gov.co')) {
-    errorMsg.textContent = 'Solo se permiten correos @presidencia.gov.co';
-    errorMsg.classList.remove('hidden');
+function startTimer() {
+  if (!startTime) {
+    startTime = Date.now();
+  }
+  
+  timeInterval = setInterval(() => {
+    updateStats();
+  }, 60000);
+}
+
+// ========================
+// RENDERIZADO DE MÓDULOS
+// ========================
+function renderModules() {
+  const modulesDiv = document.getElementById('modules');
+  modulesDiv.innerHTML = '';
+
+  modulesData.forEach((mod, i) => {
+    const moduleProgress = userProgress.modulos_completados?.[mod.id];
+    const unlocked = (i === 0 || userProgress.modulos_completados?.[modulesData[i - 1].id]);
+
+    const card = document.createElement('div');
+    card.className = unlocked ? 'module active fade-in' : 'module locked';
+    card.innerHTML = `
+      <div class="banner">
+        <img src="${mod.imagen}" alt="${mod.titulo}">
+        <h3>${mod.titulo}</h3>
+      </div>
+      <div class="module-content">
+        <video controls data-i="${i}" data-module-id="${mod.id}">
+          <source src="${mod.video}" type="video/mp4">
+          Tu navegador no soporta el elemento de video.
+        </video>
+        <div class="questions"></div>
+        <button class="btn-send" data-module-id="${mod.id}">📤 Enviar respuestas</button>
+        <div class="resultado" id="resultado-${i}"></div>
+      </div>
+    `;
+    
+    modulesDiv.appendChild(card);
+
+    const videoEl = card.querySelector('video');
+    const qdiv = card.querySelector('.questions');
+    const btn = card.querySelector('.btn-send');
+    const resDiv = card.querySelector(`#resultado-${i}`);
+
+    if (!unlocked) {
+      videoEl.removeAttribute('controls');
+    } else {
+      videoEl.controls = true;
+      videoEl.onended = () => askQuestions(mod, i, qdiv, btn);
+    }
+
+    // Mostrar puntuación si existe
+    if (moduleProgress) {
+      const pct = Math.round(moduleProgress.porcentaje || 0);
+      resDiv.textContent = `Puntaje obtenido: ${pct}%`;
+      resDiv.className = `resultado ${pct === 100 ? 'success' : pct >= 50 ? 'warning' : 'danger'}`;
+    }
+
+    if (unlocked) {
+      btn.onclick = () => submitAnswers(mod, i, qdiv, btn, resDiv);
+    }
+  });
+
+  checkCompletionAndEnableCert();
+}
+
+// ========================
+// SISTEMA DE PREGUNTAS
+// ========================
+function askQuestions(mod, idx, container, btn) {
+  container.innerHTML = '';
+  const sel = [...mod.preguntas].sort(() => Math.random() - 0.5).slice(0, 2);
+  container._sel = sel;
+
+  sel.forEach((p, j) => {
+    const divQ = document.createElement('div');
+    divQ.className = 'question-item fade-in';
+    divQ.innerHTML = `
+      <p>${j + 1}. ${p.texto}</p>
+      ${p.opciones.map(opt => `
+        <label>
+          <input name="q${idx}_${j}" type="radio" value="${opt}">
+          ${opt}
+        </label>
+      `).join('')}
+    `;
+    container.appendChild(divQ);
+  });
+
+  btn.disabled = false;
+  btn.classList.add('visible');
+}
+
+// ========================
+// ENVÍO DE RESPUESTAS - CORREGIDO
+// ========================
+async function submitAnswers(mod, idx, container, btn, resDiv) {
+  const sel = container._sel || [];
+  const respuestas = [];
+
+  sel.forEach((p, j) => {
+    const opc = container.querySelector(`input[name="q${idx}_${j}"]:checked`);
+    if (opc) respuestas.push(opc.value);
+  });
+
+  if (respuestas.length < sel.length) {
+    showNotification('Por favor contesta todas las preguntas', 'warning');
     return;
   }
 
-  try {
-    const response = await fetch('/api/registro', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, nombre, cedula })
+  // Calcular aciertos localmente
+  let correct = 0;
+  const respuestasDetalle = [];
+  sel.forEach((p, j) => {
+    const isCorrect = respuestas[j] === p.correcta;
+    if (isCorrect) correct++;
+    respuestasDetalle.push({
+      pregunta: p.texto,
+      respuesta_usuario: respuestas[j],
+      respuesta_correcta: p.correcta,
+      es_correcta: isCorrect
     });
+  });
 
-    const data = await response.json();
-
-    if (data.success) {
-      currentUser = data.user;
-      iniciarPlataforma();
-      showNotification('¡Registro exitoso! Bienvenido', 'success');
-    } else {
-      errorMsg.textContent = data.message;
-      errorMsg.classList.remove('hidden');
-    }
-  } catch (error) {
-    errorMsg.textContent = 'Error de conexión: ' + error.message;
-    errorMsg.classList.remove('hidden');
-  }
-});
-
-// ========================================
-// MANEJO DE LOGIN
-// ========================================
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  
-  const email = document.getElementById('loginEmail').value.trim();
-  const cedula = document.getElementById('loginCedula').value.trim();
-  const errorMsg = document.getElementById('loginError');
+  const pct = Math.round((correct / sel.length) * 100);
 
   try {
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, cedula })
-    });
+    // Deshabilitar botón mientras se procesa
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
 
-    const data = await response.json();
+    // Datos corregidos para el backend
+    const requestData = {
+      usuarioEmail: currentUser.email,
+      moduloId: mod.id,
+      respuestas: respuestasDetalle,
+      aciertos: correct,
+      totalPreguntas: sel.length,
+      porcentaje: pct
+    };
 
-    if (data.success) {
-      currentUser = data.user;
-      iniciarPlataforma();
-      showNotification(`¡Bienvenido ${data.user.nombre}!`, 'success');
+    console.log('🔍 DATOS ENVIADOS:', requestData);
+
+    // Enviar al backend
+    const response = await apiRequest('/modulos/respuesta', 'POST', requestData);
+
+    // Actualizar progreso local
+    console.log('🔍 RESPUESTA DEL BACKEND:', response);
+    if (response.data && response.data.progreso_usuario) {
+      userProgress = response.data.progreso_usuario;
     } else {
-      errorMsg.textContent = data.message;
-      errorMsg.classList.remove('hidden');
+      // Si no viene progreso_usuario, mantener estructura básica
+      if (!userProgress.modulos_completados) {
+        userProgress.modulos_completados = {};
+      }
+      userProgress.modulos_completados[mod.id] = {
+        porcentaje: pct,
+        aciertos: correct,
+        total_preguntas: sel.length
+      };
+      
+      // Calcular calificación global manualmente
+      const totalAciertos = Object.values(userProgress.modulos_completados).reduce((sum, modulo) => sum + (modulo.aciertos || 0), 0);
+      const totalPreguntas = Object.keys(userProgress.modulos_completados).length * 2;
+      userProgress.calificacion_global = totalPreguntas > 0 ? (totalAciertos / totalPreguntas) * 100 : 0;
     }
-  } catch (error) {
-    errorMsg.textContent = 'Error de conexión: ' + error.message;
-    errorMsg.classList.remove('hidden');
-  }
-});
 
-// ========================================
-// INICIAR PLATAFORMA
-// ========================================
-function iniciarPlataforma() {
-  document.getElementById('authContainer').classList.add('hidden');
-  document.getElementById('instructions').classList.remove('hidden');
-  document.getElementById('logout').classList.remove('hidden');
-  document.getElementById('cert').classList.remove('hidden');
-  document.getElementById('progressContainer').classList.remove('hidden');
-  document.getElementById('statsDashboard').classList.remove('hidden');
-  
-  // Renderizar módulos (función igual que el original)
-  // renderModules();
-  // startTimer();
-  // updateStats();
+    updateStats();
+
+    // Mostrar resultado
+    if (correct === 0) {
+      showNotification('Obtuviste 0%. Revisa nuevamente el video.', 'error');
+      resDiv.textContent = `Puntaje obtenido: 0%`;
+      resDiv.className = 'resultado danger';
+    } else if (correct === 1) {
+      showNotification('Obtuviste 50%. Puedes continuar, pero necesitas 80% global para el certificado.', 'warning');
+      resDiv.textContent = `Puntaje obtenido: 50%`;
+      resDiv.className = 'resultado warning';
+      unlockNextModule(idx);
+    } else {
+      showNotification('¡Excelente! Obtuviste 100%.', 'success');
+      resDiv.textContent = `Puntaje obtenido: 100%`;
+      resDiv.className = 'resultado success';
+      unlockNextModule(idx);
+    }
+
+    btn.textContent = '✅ Completado';
+    checkCompletionAndEnableCert();
+
+  } catch (error) {
+    console.error('Error enviando respuestas:', error);
+    showNotification('Error al guardar respuestas: ' + error.message, 'error');
+    btn.disabled = false;
+    btn.textContent = '📤 Enviar respuestas';
+  }
 }
 
-// ========================================
-// LOGOUT
-// ========================================
-document.getElementById('logout').addEventListener('click', async () => {
-  try {
-    await fetch('/api/logout', { method: 'POST' });
-    location.reload();
-  } catch (error) {
-    console.error('Error en logout:', error);
-    location.reload();
+// ========================
+// DESBLOQUEO DE MÓDULOS
+// ========================
+function unlockNextModule(idx) {
+  const nextCard = document.getElementById('modules').children[idx + 1];
+  if (nextCard && nextCard.classList.contains('locked')) {
+    nextCard.classList.remove('locked');
+    nextCard.classList.add('active', 'fade-in');
+    
+    const nextVideo = nextCard.querySelector('video');
+    nextVideo.controls = true;
+    nextVideo.onended = () => askQuestions(
+      modulesData[idx + 1],
+      idx + 1,
+      nextCard.querySelector('.questions'),
+      nextCard.querySelector('.btn-send')
+    );
+    
+    const nextBtn = nextCard.querySelector('.btn-send');
+    const nextRes = nextCard.querySelector(`#resultado-${idx + 1}`);
+    nextBtn.onclick = () => submitAnswers(
+      modulesData[idx + 1],
+      idx + 1,
+      nextCard.querySelector('.questions'),
+      nextBtn,
+      nextRes
+    );
   }
+}
+
+// ========================
+// CERTIFICACIÓN
+// ========================
+function checkCompletionAndEnableCert() {
+  const certBtn = document.getElementById('certBtn');
+  const globalPct = userProgress.calificacion_global || 0;
+
+  if (globalPct >= 80) {
+    certBtn.disabled = false;
+    certBtn.style.cursor = 'pointer';
+  } else {
+    certBtn.disabled = true;
+    certBtn.style.cursor = 'not-allowed';
+  }
+}
+
+async function generateCertificate() {
+  try {
+    const certBtn = document.getElementById('certBtn');
+    certBtn.disabled = true;
+    certBtn.textContent = 'Generando certificado...';
+
+    const response = await apiRequest('/certificados/generar', 'POST', {
+      usuarioEmail: currentUser.email
+    });
+
+    const certificateData = response.data;
+    
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      showNotification('Error al cargar el generador de PDF', 'error');
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const dateStr = new Date().toLocaleDateString('es-CO', { 
+      day: 'numeric', 
+      month: 'long', 
+      year: 'numeric' 
+    });
+
+    // Función para convertir imagen a Base64
+    function getImageBase64(url) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          
+          try {
+            const dataURL = canvas.toDataURL('image/png');
+            resolve(dataURL);
+          } catch (error) {
+            reject(error);
+          }
+        };
+        
+        img.onerror = () => reject(new Error('Error cargando imagen'));
+        img.src = url;
+      });
+    }
+
+    // Intentar cargar el logo
+    try {
+      const logoBase64 = await getImageBase64('https://media.presidencia.gov.co/Intranet/th/PRESIDENCIA.png');
+      doc.addImage(logoBase64, 'PNG', 65, 10, 80, 40);
+    } catch (logoError) {
+      console.log('No se pudo cargar el logo, continuando sin él');
+      doc.setFontSize(12);
+      doc.setTextColor(65, 102, 197);
+      doc.text('PRESIDENCIA DE LA REPÚBLICA', 105, 30, null, null, 'center');
+    }
+
+    // Continuar con el contenido del PDF
+    doc.setFontSize(24);
+    doc.setTextColor(65, 102, 197);
+    doc.text('CERTIFICADO DE FINALIZACIÓN', 105, 70, null, null, 'center');
+    
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Inducción Presidencia de la República', 105, 85, null, null, 'center');
+    
+    doc.setFontSize(14);
+    doc.text(`Se certifica que ${currentUser.nombre}`, 105, 110, null, null, 'center');
+    doc.text(`(${currentUser.email})`, 105, 125, null, null, 'center');
+    doc.text(`ha completado satisfactoriamente la inducción institucional`, 105, 140, null, null, 'center');
+    doc.text(`con una calificación global de ${Math.round(userProgress.calificacion_global)}%`, 105, 155, null, null, 'center');
+    
+    doc.setFontSize(12);
+    doc.text(`Fecha de emisión: ${dateStr}`, 105, 180, null, null, 'center');
+    doc.text(`Código de verificación: ${certificateData.codigo}`, 105, 195, null, null, 'center');
+    doc.text('Departamento Administrativo de la Presidencia de la República', 105, 210, null, null, 'center');
+
+    window.open(doc.output('bloburl'), '_blank');
+    showNotification('¡Certificado generado exitosamente!', 'success');
+
+  } catch (error) {
+    console.error('Error generando certificado:', error);
+    showNotification('Error al generar certificado: ' + error.message, 'error');
+  } finally {
+    const certBtn = document.getElementById('certBtn');
+    certBtn.textContent = '🏆 Generar Certificado';
+    certBtn.disabled = false;
+  }
+}
+
+// ========================
+// SISTEMA SIN PHP - SOLO LOCALSTORAGE MEJORADO
+// ========================
+function saveUserToSystem(userData = {}) {
+  try {
+    const currentUserLocal = localStorage.getItem('user');
+    const currentEmail = localStorage.getItem('email');
+    const currentScores = JSON.parse(localStorage.getItem('scores') || '{}');
+    const currentCompleted = JSON.parse(localStorage.getItem('completed') || '[]');
+    const currentStartTime = localStorage.getItem('startTime');
+    
+    if (currentUserLocal && currentEmail) {
+      // Calcular estadísticas
+      const correctSum = Object.values(currentScores).reduce((sum, c) => sum + c, 0);
+      const totalPreguntas = modulesData.length * 2;
+      const globalPct = Math.round((correctSum / totalPreguntas) * 100);
+      const progress = Math.round((Object.keys(currentScores).length / modulesData.length) * 100);
+      
+      const userToSave = {
+        id: Date.now(),
+        nombre: currentUserLocal,
+        email: currentEmail,
+        scores: currentScores,
+        completed: currentCompleted,
+        progress: progress,
+        globalScore: globalPct,
+        status: globalPct >= 80 ? 'Aprobado' : globalPct > 0 ? 'En Progreso' : 'Sin Iniciar',
+        lastActivity: new Date().toLocaleDateString('es-CO'),
+        certificadoGenerado: globalPct >= 80,
+        startTime: currentStartTime ? parseInt(currentStartTime) : Date.now(),
+        lastUpdate: new Date().toISOString(),
+        ...userData
+      };
+      
+      // Guardar en localStorage con clave específica para el dashboard
+      const allUsers = JSON.parse(localStorage.getItem('dashboard_users_data') || '[]');
+      const existingIndex = allUsers.findIndex(u => u.email === currentEmail);
+      
+      if (existingIndex >= 0) {
+        allUsers[existingIndex] = userToSave;
+        console.log('✅ Usuario actualizado:', currentEmail, globalPct + '%');
+      } else {
+        allUsers.push(userToSave);
+        console.log('✅ Nuevo usuario registrado:', currentEmail, globalPct + '%');
+      }
+      
+      localStorage.setItem('dashboard_users_data', JSON.stringify(allUsers));
+      
+      // También mantener el sistema anterior como backup
+      const globalUsers = JSON.parse(localStorage.getItem('global_users_data') || '[]');
+      const globalIndex = globalUsers.findIndex(u => u.email === currentEmail);
+      
+      if (globalIndex >= 0) {
+        globalUsers[globalIndex] = userToSave;
+      } else {
+        globalUsers.push(userToSave);
+      }
+      
+      localStorage.setItem('global_users_data', JSON.stringify(globalUsers));
+      
+      console.log('💾 Total usuarios registrados:', allUsers.length);
+      return true;
+    }
+  } catch (error) {
+    console.error('❌ Error guardando usuario:', error);
+    return false;
+  }
+}
+
+// ========================
+// INICIALIZACIÓN
+// ========================
+document.addEventListener('DOMContentLoaded', () => {
+  const login = document.getElementById('login');
+  const instructions = document.getElementById('instructions');
+  const logoutBtn = document.getElementById('logout');
+  const certDiv = document.getElementById('cert');
+  const certBtn = document.getElementById('certBtn');
+  const form = document.getElementById('form');
+  const progressContainer = document.getElementById('progressContainer');
+  const statsDashboard = document.getElementById('statsDashboard');
+
+  // ========================
+  // MANEJO DEL LOGIN
+  // ========================
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('name').value.trim();
+    const cedula = document.getElementById('cedula').value.trim();
+    const loginText = document.getElementById('loginText');
+    const loginLoading = document.getElementById('loginLoading');
+    const loginError = document.getElementById('loginError');
+
+    loginError.style.display = 'none';
+
+    if (!name || !cedula) {
+      showNotification('Por favor completa todos los campos', 'warning');
+      return;
+    }
+    
+    if (!/^\d+$/.test(cedula)) {
+      loginError.textContent = 'La cédula solo debe contener números';
+      loginError.style.display = 'block';
+      return;
+    }
+
+    // Mostrar loading
+    loginText.classList.add('hidden');
+    loginLoading.classList.remove('hidden');
+
+    try {
+      // Enviar login al backend
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: name.toUpperCase(), password: cedula })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        currentUser = {
+          id: data.user.id,
+          nombre: data.user.nombre,
+          email: data.user.email,
+          cedula: data.user.cedula
+        };
+        
+        userProgress = {
+          modulos_completados: {},
+          calificacion_global: 0,
+          porcentaje_progreso: 0
+        };
+
+        login.classList.add('hidden');
+        instructions.classList.remove('hidden');
+        logoutBtn.classList.remove('hidden');
+        certDiv.classList.remove('hidden');
+        progressContainer.classList.remove('hidden');
+        statsDashboard.classList.remove('hidden');
+        
+        renderModules();
+        startTimer();
+        updateStats();
+        
+        showNotification(`¡Bienvenido ${data.user.nombre}!`, 'success');
+      } else {
+        loginError.textContent = data.message || 'Usuario o cédula incorrectos';
+        loginError.style.display = 'block';
+      }
+    } catch (error) {
+      console.error('Error en login:', error);
+      loginError.textContent = 'Error de conexión: ' + error.message;
+      loginError.style.display = 'block';
+    } finally {
+      loginText.classList.remove('hidden');
+      loginLoading.classList.add('hidden');
+    }
+  });
 });
 
-console.log('✅ Plataforma con auto-registro cargada');
+// ========================
+// VERIFICACIÓN DE CONEXIÓN
+// ========================
+async function checkConnection() {
+  try {
+    await apiRequest('/test');
+    console.log('✅ Conexión al backend establecida');
+  } catch (error) {
+    console.error('❌ Error de conexión al backend:', error);
+    showNotification('Error de conexión al servidor. Verifica que el backend esté ejecutándose.', 'error');
+  }
+}
+
+// Verificar conexión al cargar
+checkConnection();
+
+// ========================
+// OBSERVAR CAMBIOS EN LOCALSTORAGE
+// ========================
+const originalSetItem = localStorage.setItem;
+localStorage.setItem = function(key, value) {
+  originalSetItem.call(this, key, value);
+  
+  // Si cambian puntajes, actualizar
+  if (key === 'scores' || key === 'completed') {
+    setTimeout(() => {
+      saveUserToSystem({ accion: 'update_progress' });
+    }, 1000);
+  }
+};
+
+// Actualizar cada 15 segundos si hay usuario
+setInterval(() => {
+  if (localStorage.getItem('user')) {
+    saveUserToSystem({ accion: 'periodic_update' });
+  }
+}, 15000);
+
+// ========================
+// AGREGAR ENLACE AL DASHBOARD
+// ========================
+function addDashboardLink() {
+  if (!document.getElementById('dashboardLink')) {
+    const dashboardLink = document.createElement('a');
+    dashboardLink.id = 'dashboardLink';
+    dashboardLink.href = '../admin/dashboard.html';
+    dashboardLink.className = 'hidden';
+    dashboardLink.style.cssText = `
+      position: absolute;
+      top: 1rem;
+      left: 2rem;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    `;
+    dashboardLink.innerHTML = '📊 Dashboard Admin';
+    
+    dashboardLink.addEventListener('mouseenter', () => {
+      dashboardLink.style.background = 'rgba(255, 255, 255, 0.3)';
+      dashboardLink.style.transform = 'translateY(-2px)';
+    });
+    
+    dashboardLink.addEventListener('mouseleave', () => {
+      dashboardLink.style.background = 'rgba(255, 255, 255, 0.2)';
+      dashboardLink.style.transform = 'translateY(0)';
+    });
+    
+    const header = document.querySelector('header');
+    if (header) {
+      header.appendChild(dashboardLink);
+      
+      // Mostrar enlace si hay usuario logueado
+      if (localStorage.getItem('user')) {
+        dashboardLink.classList.remove('hidden');
+      }
+    }
+  }
+}
+
+// Ejecutar
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', addDashboardLink);
+} else {
+  addDashboardLink();
+}
+
+console.log('✅ Sistema de datos mejorado (sin PHP) configurado');
+    
   </script>
 </body>
 </html>
-<--- Updated jueves, 26 de marzo de 2026, 16:53:02 -05 -->
