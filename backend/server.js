@@ -19,7 +19,7 @@ app.use('/admin', express.static(path.join(__dirname, '../admin')));
 
 // ==================== BASE DE DATOS ====================
 
-const dbPath = process.env.DB_PATH || './database.db';
+const dbPath = process.env.DB_PATH || path.join(__dirname, 'database.db');
 let db;
 
 try {
