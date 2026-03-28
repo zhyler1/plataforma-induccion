@@ -145,9 +145,31 @@ const initializeDatabase = () => {
     console.log('✅ Todas las tablas listas');
     aplicarMigraciones();
     insertDefaultModules();
+    insertDefaultUsers();
   } catch (error) {
     console.error('❌ Error inicializando BD:', error.message);
     process.exit(1);
+  }
+};
+
+const insertDefaultUsers = () => {
+  const usuarios = [
+    { nombre: 'SERGIO LOPEZ', email: 'sergio@presidencia.gov.co', cedula: '79689057' }
+  ];
+  try {
+    usuarios.forEach(function(u) {
+      const existe = db.prepare('SELECT id FROM usuarios WHERE email = ?').get(u.email);
+      if (!existe) {
+        const result = db.prepare('INSERT INTO usuarios (nombre, email, cedula, cedula_hash) VALUES (?, ?, ?, ?)').run(u.nombre, u.email, u.cedula, u.cedula);
+        const userId = result.lastInsertRowid;
+        db.prepare("INSERT INTO progreso_usuarios (usuario_id, modulos_completados, calificacion_global, porcentaje_progreso, estado_certificacion, fecha_actualizacion) VALUES (?, 0, 0, 0, 'En Progreso', CURRENT_TIMESTAMP)").run(userId);
+        console.log('✅ Usuario de prueba creado: ' + u.email);
+      } else {
+        console.log('�� Usuario ya existe: ' + u.email);
+      }
+    });
+  } catch (error) {
+    console.error('❌ Error insertando usuarios de prueba:', error.message);
   }
 };
 
