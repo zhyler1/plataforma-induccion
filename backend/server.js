@@ -34,7 +34,8 @@ const MIGRACIONES = [
   { tabla: 'usuarios', columna: 'cedula', sql: 'ALTER TABLE usuarios ADD COLUMN cedula TEXT' },
   { tabla: 'usuarios', columna: 'password_hash', sql: 'ALTER TABLE usuarios ADD COLUMN password_hash TEXT' },
   { tabla: 'respuestas_modulos', columna: 'intentos', sql: 'ALTER TABLE respuestas_modulos ADD COLUMN intentos INTEGER DEFAULT 1' },
-  { tabla: 'usuarios', columna: 'activo', sql: 'ALTER TABLE usuarios ADD COLUMN activo BOOLEAN DEFAULT 1' }
+  { tabla: 'usuarios', columna: 'activo', sql: 'ALTER TABLE usuarios ADD COLUMN activo BOOLEAN DEFAULT 1' },
+  { tabla: 'usuarios', columna: 'cedula_hash', sql: 'ALTER TABLE usuarios ADD COLUMN cedula_hash TEXT DEFAULT NULL' }
 ];
 
 const aplicarMigraciones = () => {
@@ -457,7 +458,7 @@ app.post('/api/admin/empleados', function(req, res) {
   try {
     const existe = db.prepare('SELECT id FROM usuarios WHERE cedula = ?').get(cedula);
     if (existe) return res.status(400).json({ success: false, message: 'Ya existe un usuario con esa cédula' });
-    const result = db.prepare('INSERT INTO usuarios (nombre, email, cedula) VALUES (?, ?, ?)').run(nombre, email, cedula);
+    const result = db.prepare('INSERT INTO usuarios (nombre, email, cedula, cedula_hash) VALUES (?, ?, ?, ?)').run(nombre, email, cedula, cedula);
     const userId = result.lastInsertRowid;
     db.prepare("INSERT INTO progreso_usuarios (usuario_id, modulos_completados, total_modulos, calificacion_global, porcentaje_progreso, estado_certificacion, fecha_actualizacion) VALUES (?, 0, 11, 0, 0, 'En Progreso', CURRENT_TIMESTAMP)").run(userId);
     res.json({ success: true, message: 'Empleado agregado', data: { id: userId, nombre, email, cedula } });
