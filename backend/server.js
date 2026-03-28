@@ -33,7 +33,8 @@ const MIGRACIONES = [
   { tabla: 'progreso_usuarios', columna: 'fecha_actualizacion', sql: 'ALTER TABLE progreso_usuarios ADD COLUMN fecha_actualizacion DATETIME' },
   { tabla: 'usuarios', columna: 'cedula', sql: 'ALTER TABLE usuarios ADD COLUMN cedula TEXT' },
   { tabla: 'usuarios', columna: 'password_hash', sql: 'ALTER TABLE usuarios ADD COLUMN password_hash TEXT' },
-  { tabla: 'respuestas_modulos', columna: 'intentos', sql: 'ALTER TABLE respuestas_modulos ADD COLUMN intentos INTEGER DEFAULT 1' }
+  { tabla: 'respuestas_modulos', columna: 'intentos', sql: 'ALTER TABLE respuestas_modulos ADD COLUMN intentos INTEGER DEFAULT 1' },
+  { tabla: 'usuarios', columna: 'activo', sql: 'ALTER TABLE usuarios ADD COLUMN activo BOOLEAN DEFAULT 1' }
 ];
 
 const aplicarMigraciones = () => {
