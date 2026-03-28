@@ -1253,7 +1253,7 @@ async function generateCertificate() {
     
     doc.setFontSize(12);
     doc.text(`Fecha de emisión: ${dateStr}`, 105, 180, null, null, 'center');
-    doc.text(`Código de verificación: ${certificateData.codigo}`, 105, 195, null, null, 'center');
+    doc.text(`Código de verificación: ${certificateData.codigoVerificacion}`, 105, 195, null, null, 'center');
     doc.text('Departamento Administrativo de la Presidencia de la República', 105, 210, null, null, 'center');
 
     window.open(doc.output('bloburl'), '_blank');
@@ -1345,6 +1345,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const login = document.getElementById('login');
   const instructions = document.getElementById('instructions');
   const logoutBtn = document.getElementById('logout');
+  logoutBtn.addEventListener('click', () => {
+    currentUser = null;
+    localStorage.removeItem('currentUser');
+    location.reload();
+  });
   const certDiv = document.getElementById('cert');
   const certBtn = document.getElementById('certBtn');
   const form = document.getElementById('form');

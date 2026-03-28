@@ -421,7 +421,7 @@ app.get('/api/test', function(req, res) { res.json({ success: true, message: 'AP
 
 app.use(function(err, req, res, next) {
   console.error('❌ Error no manejado:', err);
-  res.status(500).json({ success: false, message: error.message });
+  res.status(500).json({ success: false, message: err.message });
 });
 
 
