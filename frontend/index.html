@@ -1179,8 +1179,8 @@ async function generateCertificate() {
     certBtn.textContent = 'Generando certificado...';
 
     const response = await apiRequest('/certificados/generar', 'POST', {
-    });
-
+  usuarioEmail: currentUser.email
+});
     const certificateData = response.data;
     
     if (!window.jspdf || !window.jspdf.jsPDF) {
