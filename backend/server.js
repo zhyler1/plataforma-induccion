@@ -231,7 +231,7 @@ app.post('/api/login', function(req, res) {
       });
     } else {
       const nombreDefault = req.body.nombre || emailLower.split('@')[0].replace(/./g, ' ');
-      const result = db.prepare('INSERT INTO usuarios (nombre, email, cedula) VALUES (?, ?, ?)').run(nombreDefault, emailLower, cedula);
+      const result = db.prepare('INSERT INTO usuarios (nombre, email, cedula, cedula_hash) VALUES (?, ?, ?, ?)').run(nombreDefault, emailLower, cedula, cedula);
       const userId = result.lastInsertRowid;
       db.prepare("INSERT INTO progreso_usuarios (usuario_id, modulos_completados, total_modulos, calificacion_global, porcentaje_progreso, estado_certificacion, fecha_actualizacion) VALUES (?, 0, 11, 0, 0, 'En Progreso', CURRENT_TIMESTAMP)").run(userId);
       auditAction(req, userId, 'REGISTRO', 'Nuevo usuario registrado');
