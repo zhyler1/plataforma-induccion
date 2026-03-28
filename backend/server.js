@@ -440,6 +440,28 @@ app.get('/api/admin/logs', function(req, res) {
   } catch(e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
+
+app.get('/api/admin/empleados', function(req, res) {
+  try {
+    const empleados = db.prepare('SELECT id, nombre, email, cedula, fecha_registro, activo FROM usuarios ORDER BY fecha_registro DESC').all();
+    res.json({ success: true, data: empleados });
+  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.post('/api/admin/empleados', function(req, res) {
+  const nombre = req.body.nombre;
+  const cedula = req.body.cedula;
+  const email = req.body.email || (cedula + '@presidencia.gov.co');
+  try {
+    const existe = db.prepare('SELECT id FROM usuarios WHERE cedula = ?').get(cedula);
+    if (existe) return res.status(400).json({ success: false, message: 'Ya existe un usuario con esa cédula' });
+    const result = db.prepare('INSERT INTO usuarios (nombre, email, cedula) VALUES (?, ?, ?)').run(nombre, email, cedula);
+    const userId = result.lastInsertRowid;
+    db.prepare("INSERT INTO progreso_usuarios (usuario_id, modulos_completados, total_modulos, calificacion_global, porcentaje_progreso, estado_certificacion, fecha_actualizacion) VALUES (?, 0, 11, 0, 0, 'En Progreso', CURRENT_TIMESTAMP)").run(userId);
+    res.json({ success: true, message: 'Empleado agregado', data: { id: userId, nombre, email, cedula } });
+  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
 app.use('*', function(req, res) { res.status(404).json({ success: false, message: 'Endpoint no encontrado' }); });
 
 // ==================== ARRANQUE ====================
