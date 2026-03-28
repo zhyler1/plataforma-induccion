@@ -973,11 +973,11 @@
           <tr>
             <td>${emp.cedula}</td>
             <td><strong>${emp.nombre}</strong></td>
-            <td><span class="badge ${estadoClass}">${emp.estado}</span></td>
+            <td><span class="badge ${estadoClass}">${empEstado}</span></td>
             <td>${fechaRegistro}</td>
             <td>
               <div class="actions-cell">
-                ${emp.estado === 'activo' 
+                ${emp.activo 
                   ? `<button class="btn btn-small btn-warning" onclick="desactivarEmpleado('${emp.cedula}')">Desactivar</button>`
                   : `<button class="btn btn-small btn-success" onclick="activarEmpleado('${emp.cedula}')">Activar</button>`
                 }
@@ -1380,7 +1380,7 @@
           emp.nombre.toLowerCase().includes(searchTerm) ||
           emp.cedula.includes(searchTerm);
         
-        const matchEstado = !estadoFilter || emp.estado === estadoFilter;
+        const matchEstado = !estadoFilter || (emp.activo ? 'activo' : 'inactivo') === estadoFilter;
 
         return matchSearch && matchEstado;
       });
