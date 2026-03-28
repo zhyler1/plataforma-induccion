@@ -428,19 +428,6 @@ app.use('*', function(req, res) { res.status(404).json({ success: false, message
 
 // ==================== ARRANQUE ====================
 
-initializeDatabase();
-
-app.listen(PORT, HOST, function() {
-  console.log('🚀 Servidor corriendo en ' + HOST + ':' + PORT);
-  console.log('🗄️  BD: ' + dbPath);
-  console.log('🔧 Ambiente: ' + (process.env.NODE_ENV || 'development'));
-});
-
-process.on('SIGINT', function() { try { db.close(); } catch(e) {} process.exit(0); });
-process.on('SIGTERM', function() { try { db.close(); } catch(e) {} process.exit(0); });
-process.on('uncaughtException', function(err) { console.error('❌ Error no capturado:', err.message); process.exit(1); });
-process.on('unhandledRejection', function(reason) { console.error('❌ Promesa rechazada:', reason); process.exit(1); });
-
 
 app.get('/api/admin/modulos/rendimiento', function(req, res) {
   try {
@@ -456,6 +443,20 @@ app.get('/api/admin/logs', function(req, res) {
     res.json({ success: true, data: logs });
   } catch(e) { res.status(500).json({ success: false, message: e.message }); }
 });
+
+initializeDatabase();
+
+app.listen(PORT, HOST, function() {
+  console.log('🚀 Servidor corriendo en ' + HOST + ':' + PORT);
+  console.log('🗄️  BD: ' + dbPath);
+  console.log('🔧 Ambiente: ' + (process.env.NODE_ENV || 'development'));
+});
+
+process.on('SIGINT', function() { try { db.close(); } catch(e) {} process.exit(0); });
+process.on('SIGTERM', function() { try { db.close(); } catch(e) {} process.exit(0); });
+process.on('uncaughtException', function(err) { console.error('❌ Error no capturado:', err.message); process.exit(1); });
+process.on('unhandledRejection', function(reason) { console.error('❌ Promesa rechazada:', reason); process.exit(1); });
+
 
 module.exports = app;
 
