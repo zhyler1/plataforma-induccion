@@ -443,36 +443,3 @@ process.on('unhandledRejection', function(reason) { console.error('❌ Promesa r
 
 module.exports = app;
 
-// Endpoint rendimiento módulos
-app.get('/api/admin/modulos/rendimiento', function(req, res) {
-  try {
-    const modulos = db.prepare(`
-      SELECT m.nombre as modulo_nombre, m.orden,
-        COUNT(rm.id) as total_respuestas,
-        ROUND(AVG(rm.porcentaje), 2) as promedio,
-        COUNT(CASE WHEN rm.porcentaje >= 80 THEN 1 END) as aprobados
-      FROM modulos m
-      LEFT JOIN respuestas_modulos rm ON m.id = rm.modulo_id
-      GROUP BY m.id ORDER BY m.orden
-    `).all();
-    res.json({ success: true, data: modulos });
-  } catch(e) {
-    res.status(500).json({ success: false, message: e.message });
-  }
-});
-
-// Endpoint logs auditoría
-app.get('/api/admin/logs', function(req, res) {
-  try {
-    const limit = parseInt(req.query.limit) || 10;
-    const logs = db.prepare(`
-      SELECT a.*, u.email 
-      FROM auditoria a
-      LEFT JOIN usuarios u ON a.usuario_id = u.id
-      ORDER BY a.fecha DESC LIMIT ?
-    `).all(limit);
-    res.json({ success: true, data: logs });
-  } catch(e) {
-    res.status(500).json({ success: false, message: e.message });
-  }
-});
