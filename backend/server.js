@@ -186,7 +186,8 @@ const insertDefaultUsers = () => {
     usuarios.forEach(function(u) {
       const existe = db.prepare('SELECT id FROM usuarios WHERE email = ?').get(u.email);
       if (!existe) {
-        const result = db.prepare('INSERT INTO usuarios (nombre, email, cedula, cedula_hash) VALUES (?, ?, ?, ?)').run(u.nombre, u.email, u.cedula, u.cedula);
+        const hashCedula = bcrypt.hashSync(u.cedula, 10);
+        const result = db.prepare('INSERT INTO usuarios (nombre, email, cedula, cedula_hash) VALUES (?, ?, ?, ?)').run(u.nombre, u.email, u.cedula, hashCedula);
         const userId = result.lastInsertRowid;
         db.prepare("INSERT INTO progreso_usuarios (usuario_id, modulos_completados, calificacion_global, porcentaje_progreso, estado_certificacion, fecha_actualizacion) VALUES (?, 0, 0, 0, 'En Progreso', CURRENT_TIMESTAMP)").run(userId);
         console.log('✅ Usuario de prueba creado: ' + u.email);
