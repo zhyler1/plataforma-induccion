@@ -965,13 +965,14 @@
       }
 
       tbody.innerHTML = empleados.map(emp => {
-        const estadoClass = emp.estado === 'activo' ? 'badge-success' : 'badge-danger';
+        const empEstado = emp.activo ? 'activo' : 'inactivo';
+        const estadoClass = emp.activo ? 'badge-success' : 'badge-danger';
         const fechaRegistro = new Date(emp.fecha_registro).toLocaleDateString('es-CO');
 
         return `
           <tr>
             <td>${emp.cedula}</td>
-            <td><strong>${emp.nombre_completo}</strong></td>
+            <td><strong>${emp.nombre}</strong></td>
             <td><span class="badge ${estadoClass}">${emp.estado}</span></td>
             <td>${fechaRegistro}</td>
             <td>
@@ -1283,7 +1284,7 @@
         const res = await fetch(`${API_BASE}/admin/empleados`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ cedula, nombre_completo: nombre })
+          body: JSON.stringify({ cedula, nombre: nombre })
         });
 
         const data = await res.json();
@@ -1376,7 +1377,7 @@
 
       const filtrados = todosLosEmpleados.filter(emp => {
         const matchSearch = !searchTerm || 
-          emp.nombre_completo.toLowerCase().includes(searchTerm) ||
+          emp.nombre.toLowerCase().includes(searchTerm) ||
           emp.cedula.includes(searchTerm);
         
         const matchEstado = !estadoFilter || emp.estado === estadoFilter;
