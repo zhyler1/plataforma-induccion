@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 const Database = require('better-sqlite3');
 const path = require('path');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 const app = express();
@@ -265,10 +266,14 @@ app.post('/api/login', loginLimiter, function(req, res) {
     const usuario = db.prepare('SELECT * FROM usuarios WHERE email = ?').get(emailLower);
 
     if (usuario) {
-      if (usuario.cedula && usuario.cedula !== cedula) {
+      const cedulaValida = usuario.cedula_hash 
+        ? bcrypt.compareSync(cedula, usuario.cedula_hash)
+        : usuario.cedula === cedula;
+      if (!cedulaValida) {
         return res.status(401).json({ success: false, message: 'Cédula incorrecta' });
       }
-      db.prepare('UPDATE usuarios SET ultima_actividad = CURRENT_TIMESTAMP, cedula = COALESCE(cedula, ?) WHERE id = ?').run(cedula, usuario.id);
+      const nuevoHash = bcrypt.hashSync(cedula, 10);
+      db.prepare('UPDATE usuarios SET ultima_actividad = CURRENT_TIMESTAMP, cedula = ?, cedula_hash = ? WHERE id = ?').run(cedula, nuevoHash, usuario.id);
       auditAction(req, usuario.id, 'LOGIN', 'Sesión iniciada');
       console.log('✅ Login exitoso:', usuario.id);
       return res.json({
@@ -278,7 +283,8 @@ app.post('/api/login', loginLimiter, function(req, res) {
       });
     } else {
       const nombreDefault = req.body.nombre || emailLower.split('@')[0].replace(/./g, ' ');
-      const result = db.prepare('INSERT INTO usuarios (nombre, email, cedula, cedula_hash) VALUES (?, ?, ?, ?)').run(nombreDefault, emailLower, cedula, cedula);
+      const cedulaHash = bcrypt.hashSync(cedula, 10);
+      const result = db.prepare('INSERT INTO usuarios (nombre, email, cedula, cedula_hash) VALUES (?, ?, ?, ?)').run(nombreDefault, emailLower, cedula, cedulaHash);
       const userId = result.lastInsertRowid;
       db.prepare("INSERT INTO progreso_usuarios (usuario_id, modulos_completados, total_modulos, calificacion_global, porcentaje_progreso, estado_certificacion, fecha_actualizacion) VALUES (?, 0, 11, 0, 0, 'En Progreso', CURRENT_TIMESTAMP)").run(userId);
       auditAction(req, userId, 'REGISTRO', 'Nuevo usuario registrado');
