@@ -1061,12 +1061,13 @@ async function submitAnswers(mod, idx, container, btn, resDiv) {
 
     // Datos corregidos para el backend
     const requestData = {
-      moduloId: mod.id,
-      respuestas: respuestasDetalle,
-      aciertos: correct,
-      totalPreguntas: sel.length,
-      porcentaje: pct
-    };
+  usuarioEmail: currentUser.email,
+  moduloId: mod.id,
+  respuestas: respuestasDetalle,
+  aciertos: correct,
+  totalPreguntas: sel.length,
+  porcentaje: pct
+};
 
     console.log('🔍 DATOS ENVIADOS:', requestData);
 
