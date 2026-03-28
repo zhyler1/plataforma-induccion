@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: induccion-presidencia
+    env: node
+    buildCommand: npm install --prefix backend
+    startCommand: node backend/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+    disk:
+      name: sqlite-data
+      mountPath: /data
+      sizeGB: 1
