@@ -667,6 +667,8 @@
 // ========================
 const API_BASE_URL = '/api';
 let currentUser = null;
+const savedUser = localStorage.getItem('currentUser');
+if (savedUser) currentUser = JSON.parse(savedUser);
 let userProgress = {};
 let startTime = null;
 let timeInterval = null;
@@ -1410,7 +1412,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderModules();
         startTimer();
         updateStats();
-        
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
         showNotification(`¡Bienvenido ${data.user.nombre}!`, 'success');
       } else {
         loginError.textContent = data.message || 'Usuario o cédula incorrectos';
