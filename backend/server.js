@@ -35,7 +35,10 @@ const MIGRACIONES = [
   { tabla: 'usuarios', columna: 'password_hash', sql: 'ALTER TABLE usuarios ADD COLUMN password_hash TEXT' },
   { tabla: 'respuestas_modulos', columna: 'intentos', sql: 'ALTER TABLE respuestas_modulos ADD COLUMN intentos INTEGER DEFAULT 1' },
   { tabla: 'usuarios', columna: 'activo', sql: 'ALTER TABLE usuarios ADD COLUMN activo BOOLEAN DEFAULT 1' },
-  { tabla: 'usuarios', columna: 'cedula_hash', sql: 'ALTER TABLE usuarios ADD COLUMN cedula_hash TEXT DEFAULT NULL' }
+  { tabla: 'usuarios', columna: 'cedula_hash', sql: 'ALTER TABLE usuarios ADD COLUMN cedula_hash TEXT DEFAULT NULL' },
+  { tabla: 'progreso_usuarios', columna: 'total_modulos', sql: 'ALTER TABLE progreso_usuarios ADD COLUMN total_modulos INTEGER DEFAULT 11' },
+  { tabla: 'progreso_usuarios', columna: 'fecha_inicio', sql: 'ALTER TABLE progreso_usuarios ADD COLUMN fecha_inicio DATETIME DEFAULT CURRENT_TIMESTAMP' },
+  { tabla: 'progreso_usuarios', columna: 'fecha_ultima_actividad', sql: 'ALTER TABLE progreso_usuarios ADD COLUMN fecha_ultima_actividad DATETIME DEFAULT CURRENT_TIMESTAMP' }
 ];
 
 const aplicarMigraciones = () => {
@@ -460,7 +463,7 @@ app.post('/api/admin/empleados', function(req, res) {
     if (existe) return res.status(400).json({ success: false, message: 'Ya existe un usuario con esa cédula' });
     const result = db.prepare('INSERT INTO usuarios (nombre, email, cedula, cedula_hash) VALUES (?, ?, ?, ?)').run(nombre, email, cedula, cedula);
     const userId = result.lastInsertRowid;
-    db.prepare("INSERT INTO progreso_usuarios (usuario_id, modulos_completados, total_modulos, calificacion_global, porcentaje_progreso, estado_certificacion, fecha_actualizacion) VALUES (?, 0, 11, 0, 0, 'En Progreso', CURRENT_TIMESTAMP)").run(userId);
+    db.prepare("INSERT INTO progreso_usuarios (usuario_id, modulos_completados, calificacion_global, porcentaje_progreso, estado_certificacion, fecha_actualizacion) VALUES (?, 0, 0, 0, 'En Progreso', CURRENT_TIMESTAMP)").run(userId);
     res.json({ success: true, message: 'Empleado agregado', data: { id: userId, nombre, email, cedula } });
   } catch(e) { res.status(500).json({ success: false, message: e.message }); }
 });
