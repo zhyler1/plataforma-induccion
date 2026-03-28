@@ -1514,6 +1514,13 @@ async function checkConnection() {
 checkConnection();
 
 // ========================
+// MANTENER SERVIDOR ACTIVO
+// ========================
+setInterval(() => {
+  fetch('/api/test').catch(() => {});
+}, 600000); // cada 10 minutos
+
+// ========================
 // OBSERVAR CAMBIOS EN LOCALSTORAGE
 // ========================
 const originalSetItem = localStorage.setItem;
