@@ -30,7 +30,7 @@ try {
 
 const MIGRACIONES = [
   { tabla: 'progreso_usuarios', columna: 'porcentaje_progreso', sql: 'ALTER TABLE progreso_usuarios ADD COLUMN porcentaje_progreso REAL DEFAULT 0' },
-  { tabla: 'progreso_usuarios', columna: 'fecha_actualizacion', sql: 'ALTER TABLE progreso_usuarios ADD COLUMN fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP' },
+  { tabla: 'progreso_usuarios', columna: 'fecha_actualizacion', sql: 'ALTER TABLE progreso_usuarios ADD COLUMN fecha_actualizacion DATETIME' },
   { tabla: 'usuarios', columna: 'cedula', sql: 'ALTER TABLE usuarios ADD COLUMN cedula TEXT' },
   { tabla: 'usuarios', columna: 'password_hash', sql: 'ALTER TABLE usuarios ADD COLUMN password_hash TEXT' },
   { tabla: 'respuestas_modulos', columna: 'intentos', sql: 'ALTER TABLE respuestas_modulos ADD COLUMN intentos INTEGER DEFAULT 1' }
@@ -388,7 +388,7 @@ app.get('/api/admin/usuarios', function(req, res) {
 });
 app.get('/api/migrar', function(req, res) {
   try {
-    db.exec('ALTER TABLE progreso_usuarios ADD COLUMN fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP');
+    db.exec('ALTER TABLE progreso_usuarios ADD COLUMN fecha_actualizacion DATETIME');
     res.json({ success: true, message: 'Migración aplicada' });
   } catch(e) {
     res.json({ success: false, message: e.message });
