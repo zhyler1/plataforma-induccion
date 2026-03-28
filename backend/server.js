@@ -400,6 +400,28 @@ app.get('/api/migrar', function(req, res) {
     res.json({ success: false, message: e.message });
   }
 });
+// ==================== RECALCULAR PROGRESO ====================
+app.get('/api/admin/recalcular/:email', function(req, res) {
+  try {
+    const usuario = db.prepare('SELECT id FROM usuarios WHERE email = ?').get(req.params.email.toLowerCase());
+    if (!usuario) return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+    
+    const stats = db.prepare('SELECT COUNT(*) as modulos_completados, COALESCE(SUM(aciertos), 0) as total_aciertos, COALESCE(SUM(total_preguntas), 0) as total_preguntas FROM respuestas_modulos WHERE usuario_id = ?').get(usuario.id);
+    const calificacionGlobal = stats.total_preguntas > 0 ? (stats.total_aciertos / stats.total_preguntas) * 100 : 0;
+    const porcentajeProgreso = (stats.modulos_completados / 11) * 100;
+    let estadoCertificacion = 'En Progreso';
+    if (stats.modulos_completados >= 11) {
+      estadoCertificacion = calificacionGlobal >= 80 ? 'Aprobado' : 'Reprobado';
+    }
+    
+    const updateResult = db.prepare('UPDATE progreso_usuarios SET modulos_completados = ?, calificacion_global = ?, porcentaje_progreso = ?, estado_certificacion = ?, fecha_actualizacion = CURRENT_TIMESTAMP WHERE usuario_id = ?').run(stats.modulos_completados, calificacionGlobal, porcentajeProgreso, estadoCertificacion, usuario.id);
+    
+    res.json({ success: true, stats, calificacionGlobal, porcentajeProgreso, estadoCertificacion, changes: updateResult.changes });
+  } catch(e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
 // ==================== DEBUG ====================
 
 app.get('/api/debug', function(req, res) {
