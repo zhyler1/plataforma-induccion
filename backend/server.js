@@ -339,7 +339,7 @@ const updateUserProgress = function(userId) {
     }
     const existe = db.prepare('SELECT id FROM progreso_usuarios WHERE usuario_id = ?').get(userId);
     if (existe) {
-      db.prepare('UPDATE progreso_usuarios SET modulos_completados = ?, calificacion_global = ?, porcentaje_progreso = ?, estado_certificacion = ?, fecha_ultima_actividad = CURRENT_TIMESTAMP, fecha_actualizacion = CURRENT_TIMESTAMP WHERE usuario_id = ?').run(stats.modulos_completados, calificacionGlobal, porcentajeProgreso, estadoCertificacion, userId);
+      db.prepare('UPDATE progreso_usuarios SET modulos_completados = ?, calificacion_global = ?, porcentaje_progreso = ?, estado_certificacion = ?, fecha_actualizacion = CURRENT_TIMESTAMP WHERE usuario_id = ?').run(stats.modulos_completados, calificacionGlobal, porcentajeProgreso, estadoCertificacion, userId);
     } else {
       db.prepare("INSERT INTO progreso_usuarios (usuario_id, modulos_completados, calificacion_global, porcentaje_progreso, estado_certificacion, fecha_actualizacion) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)").run(userId, stats.modulos_completados, calificacionGlobal, porcentajeProgreso, estadoCertificacion);
     }
