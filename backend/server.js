@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const Database = require('better-sqlite3');
 const path = require('path');
 const crypto = require('crypto');
@@ -9,7 +11,30 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 
-app.use(cors());
+app.use(cors({
+  origin: function(origin, callback) {
+    const allowed = ['https://induccion-presidencia.onrender.com', 'https://media.presidencia.gov.co'];
+    if (!origin || allowed.some(a => origin.startsWith(a))) {
+      callback(null, true);
+    } else {
+      callback(null, true); // permisivo en desarrollo
+    }
+  },
+  credentials: true
+}));
+
+app.use(helmet({
+  contentSecurityPolicy: false // evitar bloqueos con recursos externos
+}));
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 10, // máximo 10 intentos
+  message: { success: false, message: 'Demasiados intentos. Intenta de nuevo en 15 minutos.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../frontend')));
@@ -216,7 +241,7 @@ const auditAction = function(req, userId, action, details) {
 
 // ==================== LOGIN PRINCIPAL ====================
 
-app.post('/api/login', function(req, res) {
+app.post('/api/login', loginLimiter, function(req, res) {
   const email = req.body.email;
   const cedula = req.body.cedula;
 
@@ -382,9 +407,30 @@ app.get('/api/certificados/verificar/:codigo', function(req, res) {
   }
 });
 
+// ==================== PROTECCION ADMIN ====================
+const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+const ADMIN_PASS = process.env.ADMIN_PASS || 'Presidencia2025*';
+
+const adminAuth = function(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  if (!authHeader || !authHeader.startsWith('Basic ')) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="Panel Administrativo"');
+    return res.status(401).json({ success: false, message: 'Acceso no autorizado' });
+  }
+  const base64 = authHeader.split(' ')[1];
+  const decoded = Buffer.from(base64, 'base64').toString('utf-8');
+  const [user, pass] = decoded.split(':');
+  if (user === ADMIN_USER && pass === ADMIN_PASS) {
+    next();
+  } else {
+    res.setHeader('WWW-Authenticate', 'Basic realm="Panel Administrativo"');
+    return res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
+  }
+};
+
 // ==================== ADMIN ====================
 
-app.get('/api/admin/estadisticas', function(req, res) {
+app.get('/api/admin/estadisticas', adminAuth, function(req, res) {
   try {
     const resumen = db.prepare('SELECT COUNT(DISTINCT u.id) as total_usuarios, COUNT(DISTINCT CASE WHEN p.calificacion_global >= 80 THEN u.id END) as usuarios_aprobados, COUNT(DISTINCT c.usuario_id) as usuarios_certificados, ROUND(AVG(p.calificacion_global), 2) as promedio_calificacion FROM usuarios u LEFT JOIN progreso_usuarios p ON u.id = p.usuario_id LEFT JOIN certificados c ON u.id = c.usuario_id AND c.valido = 1').get() || {};
     const modulos = db.prepare('SELECT m.nombre as nombre, m.nombre as modulo_nombre, m.orden, COUNT(rm.id) as total_respuestas, ROUND(AVG(rm.porcentaje), 2) as promedio_calificacion FROM modulos m LEFT JOIN respuestas_modulos rm ON m.id = rm.modulo_id GROUP BY m.id ORDER BY m.orden').all() || [];
@@ -395,7 +441,7 @@ app.get('/api/admin/estadisticas', function(req, res) {
   }
 });
 
-app.get('/api/admin/usuarios', function(req, res) {
+app.get('/api/admin/usuarios', adminAuth, function(req, res) {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 50;
   const search = req.query.search || '';
@@ -414,54 +460,10 @@ app.get('/api/admin/usuarios', function(req, res) {
     return res.status(500).json({ success: false, message: error.message });
   }
 });
-app.get('/api/migrar', function(req, res) {
-  try {
-    db.exec('ALTER TABLE progreso_usuarios ADD COLUMN fecha_actualizacion DATETIME');
-    res.json({ success: true, message: 'Migración aplicada' });
-  } catch(e) {
-    res.json({ success: false, message: e.message });
-  }
-});
-// ==================== RECALCULAR PROGRESO ====================
-app.get('/api/admin/recalcular/:email', function(req, res) {
-  try {
-    const usuario = db.prepare('SELECT id FROM usuarios WHERE email = ?').get(req.params.email.toLowerCase());
-    if (!usuario) return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
-    
-    const stats = db.prepare('SELECT COUNT(*) as modulos_completados, COALESCE(SUM(aciertos), 0) as total_aciertos, COALESCE(SUM(total_preguntas), 0) as total_preguntas FROM respuestas_modulos WHERE usuario_id = ?').get(usuario.id);
-    const calificacionGlobal = stats.total_preguntas > 0 ? (stats.total_aciertos / stats.total_preguntas) * 100 : 0;
-    const porcentajeProgreso = (stats.modulos_completados / 11) * 100;
-    let estadoCertificacion = 'En Progreso';
-    if (stats.modulos_completados >= 11) {
-      estadoCertificacion = calificacionGlobal >= 80 ? 'Aprobado' : 'Reprobado';
-    }
-    
-    const updateResult = db.prepare('UPDATE progreso_usuarios SET modulos_completados = ?, calificacion_global = ?, porcentaje_progreso = ?, estado_certificacion = ?, fecha_actualizacion = CURRENT_TIMESTAMP WHERE usuario_id = ?').run(stats.modulos_completados, calificacionGlobal, porcentajeProgreso, estadoCertificacion, usuario.id);
-    
-    res.json({ success: true, stats, calificacionGlobal, porcentajeProgreso, estadoCertificacion, changes: updateResult.changes });
-  } catch(e) {
-    res.status(500).json({ success: false, message: e.message });
-  }
-});
 
-// ==================== DEBUG ====================
 
-app.get('/api/debug', function(req, res) {
-  try {
-    const tablas = ['usuarios', 'modulos', 'respuestas_modulos', 'progreso_usuarios', 'certificados', 'auditoria'];
-    const info = {};
-    tablas.forEach(function(tabla) {
-      try {
-        const columns = db.prepare('PRAGMA table_info(' + tabla + ')').all();
-        const count = db.prepare('SELECT COUNT(*) as total FROM ' + tabla).get();
-        info[tabla] = { columnas: columns.map(function(c) { return c.name + ' (' + c.type + ')'; }), total_registros: count.total };
-      } catch (e) { info[tabla] = { error: e.message }; }
-    });
-    res.json({ success: true, dbPath: dbPath, nodeEnv: process.env.NODE_ENV, tablas: info, timestamp: new Date().toISOString() });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
+
+
 
 // ==================== ESTÁTICAS ====================
 
@@ -475,14 +477,14 @@ app.use(function(err, req, res, next) {
 });
 
 
-app.get('/api/admin/modulos/rendimiento', function(req, res) {
+app.get('/api/admin/modulos/rendimiento', adminAuth, function(req, res) {
   try {
     const modulos = db.prepare('SELECT m.nombre as nombre, m.nombre as modulo_nombre, m.orden, COUNT(rm.id) as total_respuestas, ROUND(AVG(rm.porcentaje), 2) as promedio, COUNT(CASE WHEN rm.porcentaje >= 80 THEN 1 END) as aprobados FROM modulos m LEFT JOIN respuestas_modulos rm ON m.id = rm.modulo_id GROUP BY m.id ORDER BY m.orden').all();
     res.json({ success: true, data: modulos });
   } catch(e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-app.get('/api/admin/logs', function(req, res) {
+app.get('/api/admin/logs', adminAuth, function(req, res) {
   try {
     const limit = parseInt(req.query.limit) || 10;
     const logs = db.prepare('SELECT a.*, u.email FROM auditoria a LEFT JOIN usuarios u ON a.usuario_id = u.id ORDER BY a.fecha DESC LIMIT ?').all(limit);
@@ -491,14 +493,14 @@ app.get('/api/admin/logs', function(req, res) {
 });
 
 
-app.get('/api/admin/empleados', function(req, res) {
+app.get('/api/admin/empleados', adminAuth, function(req, res) {
   try {
     const empleados = db.prepare('SELECT id, nombre, email, cedula, fecha_registro, activo FROM usuarios ORDER BY fecha_registro DESC').all();
     res.json({ success: true, data: empleados });
   } catch(e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-app.post('/api/admin/empleados', function(req, res) {
+app.post('/api/admin/empleados', adminAuth, function(req, res) {
   const nombre = req.body.nombre;
   const cedula = req.body.cedula;
   const email = req.body.email || (cedula + '@presidencia.gov.co');
