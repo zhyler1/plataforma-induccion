@@ -386,7 +386,14 @@ app.get('/api/admin/usuarios', function(req, res) {
     return res.status(500).json({ success: false, message: error.message });
   }
 });
-
+app.get('/api/migrar', function(req, res) {
+  try {
+    db.exec('ALTER TABLE progreso_usuarios ADD COLUMN fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP');
+    res.json({ success: true, message: 'Migración aplicada' });
+  } catch(e) {
+    res.json({ success: false, message: e.message });
+  }
+});
 // ==================== DEBUG ====================
 
 app.get('/api/debug', function(req, res) {
