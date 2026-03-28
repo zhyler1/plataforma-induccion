@@ -239,7 +239,7 @@ app.post('/api/login', function(req, res) {
     }
   } catch (error) {
     console.error('❌ Error en login:', error.message);
-    return res.status(500).json({ success: false, message: 'Error interno del servidor' });
+    return res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -265,7 +265,7 @@ app.get('/api/modulos/progreso/:email', function(req, res) {
     res.json({ success: true, data: { respuestas: respuestas, progreso: progreso || {} } });
   } catch (error) {
     console.error('❌ Error obteniendo progreso:', error.message);
-    return res.status(500).json({ success: false, message: 'Error interno del servidor' });
+    return res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -351,7 +351,7 @@ app.get('/api/certificados/verificar/:codigo', function(req, res) {
     if (!certificado) return res.status(404).json({ success: false, message: 'Certificado no encontrado o inválido' });
     res.json({ success: true, data: { valido: true, usuario: { nombre: certificado.nombre, email: certificado.email }, calificacion: certificado.calificacion_final, fechaEmision: certificado.fecha_emision, codigoVerificacion: certificado.codigo_verificacion } });
   } catch (error) {
-    return res.status(500).json({ success: false, message: 'Error interno del servidor' });
+    return res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -364,7 +364,7 @@ app.get('/api/admin/estadisticas', function(req, res) {
     const actividad_reciente = db.prepare("SELECT DATE(u.fecha_registro) as fecha, COUNT(*) as nuevos_usuarios FROM usuarios u WHERE u.fecha_registro >= date('now', '-30 days') GROUP BY DATE(u.fecha_registro) ORDER BY fecha DESC LIMIT 30").all() || [];
     res.json({ success: true, data: { resumen, modulos, actividad_reciente } });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -383,7 +383,7 @@ app.get('/api/admin/usuarios', function(req, res) {
     const total = db.prepare('SELECT COUNT(*) as total FROM usuarios u LEFT JOIN progreso_usuarios p ON u.id = p.usuario_id WHERE ' + whereClause).get(...params).total || 0;
     res.json({ success: true, data: { usuarios, pagination: { page, limit, total, pages: Math.ceil(total / limit) } } });
   } catch (error) {
-    return res.status(500).json({ success: false, message: 'Error interno del servidor' });
+    return res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -414,7 +414,7 @@ app.get('/api/test', function(req, res) { res.json({ success: true, message: 'AP
 
 app.use(function(err, req, res, next) {
   console.error('❌ Error no manejado:', err);
-  res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  res.status(500).json({ success: false, message: error.message });
 });
 
 app.use('*', function(req, res) { res.status(404).json({ success: false, message: 'Endpoint no encontrado' }); });
