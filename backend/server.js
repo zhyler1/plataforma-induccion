@@ -424,10 +424,6 @@ app.use(function(err, req, res, next) {
   res.status(500).json({ success: false, message: error.message });
 });
 
-app.use('*', function(req, res) { res.status(404).json({ success: false, message: 'Endpoint no encontrado' }); });
-
-// ==================== ARRANQUE ====================
-
 
 app.get('/api/admin/modulos/rendimiento', function(req, res) {
   try {
@@ -443,6 +439,11 @@ app.get('/api/admin/logs', function(req, res) {
     res.json({ success: true, data: logs });
   } catch(e) { res.status(500).json({ success: false, message: e.message }); }
 });
+
+app.use('*', function(req, res) { res.status(404).json({ success: false, message: 'Endpoint no encontrado' }); });
+
+// ==================== ARRANQUE ====================
+
 
 initializeDatabase();
 
