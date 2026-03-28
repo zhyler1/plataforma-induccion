@@ -183,9 +183,38 @@
 
     #login h2 {
       color: var(--primary-blue);
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
       font-size: 2rem;
       font-weight: 700;
+    }
+
+    .login-tabs {
+      display: flex;
+      border-radius: var(--border-radius);
+      background: var(--gray-100);
+      padding: 4px;
+      margin-bottom: 1.5rem;
+      gap: 4px;
+    }
+
+    .login-tab {
+      flex: 1;
+      padding: 0.75rem;
+      border: none;
+      border-radius: calc(var(--border-radius) - 4px);
+      background: transparent;
+      font-weight: 600;
+      font-family: inherit;
+      font-size: 0.95rem;
+      cursor: pointer;
+      color: var(--gray-500);
+      transition: var(--transition);
+    }
+
+    .login-tab.active {
+      background: white;
+      color: var(--primary-blue);
+      box-shadow: var(--shadow-sm);
     }
 
     #login input {
@@ -635,15 +664,34 @@
   <!-- Formulario de login -->
   <section id="login" class="fade-in">
     <h2>¡Bienvenido!</h2>
-    <form id="form">
-      <input id="loginNombre" name="nombre" type="text" placeholder="Nombre completo" required>
-      <input id="loginEmail" name="email" type="email" placeholder="usuario@presidencia.gov.co" required>
-      <input id="cedula" name="cedula" type="text" placeholder="Número de cédula" required pattern="[0-9]+" title="Solo números">
+
+    <!-- Pestañas -->
+    <div class="login-tabs">
+      <button class="login-tab active" id="tabIngresar" onclick="switchLoginTab('ingresar')">Ingresar</button>
+      <button class="login-tab" id="tabRegistrarse" onclick="switchLoginTab('registrarse')">Registrarse</button>
+    </div>
+
+    <!-- Formulario Ingresar -->
+    <form id="formIngresar">
+      <input id="loginEmailIngreso" name="email" type="email" placeholder="usuario@presidencia.gov.co" required>
+      <input id="loginCedulaIngreso" name="cedula" type="text" placeholder="Número de cédula" required pattern="[0-9]+" title="Solo números">
       <button type="submit" class="btn-login">
-        <span id="loginText">Ingresar a la plataforma</span>
-        <span id="loginLoading" class="loading hidden"></span>
+        <span id="loginTextIngreso">Ingresar a la plataforma</span>
+        <span id="loginLoadingIngreso" class="loading hidden"></span>
       </button>
-      <div id="loginError" style="color: red; margin-top: 1rem; display: none;"></div>
+      <div id="loginErrorIngreso" style="color: red; margin-top: 1rem; display: none;"></div>
+    </form>
+
+    <!-- Formulario Registrarse -->
+    <form id="formRegistrarse" class="hidden">
+      <input id="loginNombreRegistro" name="nombre" type="text" placeholder="Nombre completo" required>
+      <input id="loginEmailRegistro" name="email" type="email" placeholder="usuario@presidencia.gov.co" required>
+      <input id="loginCedulaRegistro" name="cedula" type="text" placeholder="Número de cédula" required pattern="[0-9]+" title="Solo números">
+      <button type="submit" class="btn-login">
+        <span id="loginTextRegistro">Crear cuenta e ingresar</span>
+        <span id="loginLoadingRegistro" class="loading hidden"></span>
+      </button>
+      <div id="loginErrorRegistro" style="color: red; margin-top: 1rem; display: none;"></div>
     </form>
   </section>
 
@@ -1253,7 +1301,7 @@ async function generateCertificate() {
     
     doc.setFontSize(12);
     doc.text(`Fecha de emisión: ${dateStr}`, 105, 180, null, null, 'center');
-    doc.text(`Código de verificación: ${certificateData.codigoVerificacion}`, 105, 195, null, null, 'center');
+    doc.text(`Código de verificación: ${certificateData.codigo}`, 105, 195, null, null, 'center');
     doc.text('Departamento Administrativo de la Presidencia de la República', 105, 210, null, null, 'center');
 
     window.open(doc.output('bloburl'), '_blank');
@@ -1341,97 +1389,111 @@ function saveUserToSystem(userData = {}) {
 // ========================
 // INICIALIZACIÓN
 // ========================
+// ========================
+// SWITCH DE PESTAÑAS LOGIN
+// ========================
+function switchLoginTab(tab) {
+  const formIngresar = document.getElementById('formIngresar');
+  const formRegistrarse = document.getElementById('formRegistrarse');
+  const tabIngresar = document.getElementById('tabIngresar');
+  const tabRegistrarse = document.getElementById('tabRegistrarse');
+  if (tab === 'ingresar') {
+    formIngresar.classList.remove('hidden');
+    formRegistrarse.classList.add('hidden');
+    tabIngresar.classList.add('active');
+    tabRegistrarse.classList.remove('active');
+  } else {
+    formIngresar.classList.add('hidden');
+    formRegistrarse.classList.remove('hidden');
+    tabIngresar.classList.remove('active');
+    tabRegistrarse.classList.add('active');
+  }
+}
+
+// ========================
+// FUNCIÓN COMPARTIDA DE LOGIN
+// ========================
+async function procesarLogin(email, cedula, nombre, errorEl, textEl, loadingEl) {
+  errorEl.style.display = 'none';
+  if (!email || !cedula) { showNotification('Por favor completa todos los campos', 'warning'); return; }
+  if (!/^[0-9]+$/.test(cedula)) { errorEl.textContent = 'La cédula solo debe contener números'; errorEl.style.display = 'block'; return; }
+
+  textEl.classList.add('hidden');
+  loadingEl.classList.remove('hidden');
+
+  try {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, cedula, nombre: nombre || '' })
+    });
+    const data = await response.json();
+
+    if (data.success) {
+      currentUser = { id: data.user.id, nombre: data.user.nombre, email: data.user.email, cedula: data.user.cedula };
+      userProgress = { modulos_completados: {}, calificacion_global: 0, porcentaje_progreso: 0 };
+
+      document.getElementById('login').classList.add('hidden');
+      document.getElementById('instructions').classList.remove('hidden');
+      document.getElementById('logout').classList.remove('hidden');
+      document.getElementById('cert').classList.remove('hidden');
+      document.getElementById('progressContainer').classList.remove('hidden');
+      document.getElementById('statsDashboard').classList.remove('hidden');
+
+      renderModules();
+      startTimer();
+      updateStats();
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      showNotification(`¡Bienvenido ${data.user.nombre}!`, 'success');
+    } else {
+      errorEl.textContent = data.message || 'Datos incorrectos';
+      errorEl.style.display = 'block';
+    }
+  } catch (error) {
+    console.error('Error en login:', error);
+    errorEl.textContent = 'Error de conexión: ' + error.message;
+    errorEl.style.display = 'block';
+  } finally {
+    textEl.classList.remove('hidden');
+    loadingEl.classList.add('hidden');
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  const login = document.getElementById('login');
-  const instructions = document.getElementById('instructions');
-  const logoutBtn = document.getElementById('logout');
-  logoutBtn.addEventListener('click', () => {
+  // Logout
+  document.getElementById('logout').addEventListener('click', () => {
     currentUser = null;
     localStorage.removeItem('currentUser');
     location.reload();
   });
-  const certDiv = document.getElementById('cert');
-  const certBtn = document.getElementById('certBtn');
-  const form = document.getElementById('form');
-  const progressContainer = document.getElementById('progressContainer');
-  const statsDashboard = document.getElementById('statsDashboard');
 
-  // ========================
-  // MANEJO DEL LOGIN
-  // ========================
-  form.addEventListener('submit', async (e) => {
+  // Formulario Ingresar
+  document.getElementById('formIngresar').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById("loginEmail").value.trim();
-    const cedula = document.getElementById('cedula').value.trim();
-    const loginText = document.getElementById('loginText');
-    const loginLoading = document.getElementById('loginLoading');
-    const loginError = document.getElementById('loginError');
+    await procesarLogin(
+      document.getElementById('loginEmailIngreso').value.trim(),
+      document.getElementById('loginCedulaIngreso').value.trim(),
+      '',
+      document.getElementById('loginErrorIngreso'),
+      document.getElementById('loginTextIngreso'),
+      document.getElementById('loginLoadingIngreso')
+    );
+  });
 
-    loginError.style.display = 'none';
-
-    if (!email || !cedula) {
-      showNotification('Por favor completa todos los campos', 'warning');
-      return;
-    }
-    
-    if (!/^\d+$/.test(cedula)) {
-      loginError.textContent = 'La cédula solo debe contener números';
-      loginError.style.display = 'block';
-      return;
-    }
-
-    // Mostrar loading
-    loginText.classList.add('hidden');
-    loginLoading.classList.remove('hidden');
-
-    try {
-      // Enviar login al backend
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, cedula: cedula, nombre: document.getElementById("loginNombre").value.trim() })
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        currentUser = {
-          id: data.user.id,
-          nombre: data.user.nombre,
-          email: data.user.email,
-          cedula: data.user.cedula
-        };
-        
-        userProgress = {
-          modulos_completados: {},
-          calificacion_global: 0,
-          porcentaje_progreso: 0
-        };
-
-        login.classList.add('hidden');
-        instructions.classList.remove('hidden');
-        logoutBtn.classList.remove('hidden');
-        certDiv.classList.remove('hidden');
-        progressContainer.classList.remove('hidden');
-        statsDashboard.classList.remove('hidden');
-        
-        renderModules();
-        startTimer();
-        updateStats();
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        showNotification(`¡Bienvenido ${data.user.nombre}!`, 'success');
-      } else {
-        loginError.textContent = data.message || 'Usuario o cédula incorrectos';
-        loginError.style.display = 'block';
-      }
-    } catch (error) {
-      console.error('Error en login:', error);
-      loginError.textContent = 'Error de conexión: ' + error.message;
-      loginError.style.display = 'block';
-    } finally {
-      loginText.classList.remove('hidden');
-      loginLoading.classList.add('hidden');
-    }
+  // Formulario Registrarse
+  document.getElementById('formRegistrarse').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById('loginNombreRegistro').value.trim();
+    const errorEl = document.getElementById('loginErrorRegistro');
+    if (!nombre) { errorEl.textContent = 'El nombre es requerido'; errorEl.style.display = 'block'; return; }
+    await procesarLogin(
+      document.getElementById('loginEmailRegistro').value.trim(),
+      document.getElementById('loginCedulaRegistro').value.trim(),
+      nombre,
+      errorEl,
+      document.getElementById('loginTextRegistro'),
+      document.getElementById('loginLoadingRegistro')
+    );
   });
 });
 
