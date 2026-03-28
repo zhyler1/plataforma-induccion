@@ -360,7 +360,7 @@ app.get('/api/certificados/verificar/:codigo', function(req, res) {
 app.get('/api/admin/estadisticas', function(req, res) {
   try {
     const resumen = db.prepare('SELECT COUNT(DISTINCT u.id) as total_usuarios, COUNT(DISTINCT CASE WHEN p.calificacion_global >= 80 THEN u.id END) as usuarios_aprobados, COUNT(DISTINCT c.usuario_id) as usuarios_certificados, ROUND(AVG(p.calificacion_global), 2) as promedio_calificacion FROM usuarios u LEFT JOIN progreso_usuarios p ON u.id = p.usuario_id LEFT JOIN certificados c ON u.id = c.usuario_id AND c.valido = 1').get() || {};
-    const modulos = db.prepare('SELECT m.nombre as modulo_nombre, m.orden, COUNT(rm.id) as total_respuestas, ROUND(AVG(rm.porcentaje), 2) as promedio_calificacion FROM modulos m LEFT JOIN respuestas_modulos rm ON m.id = rm.modulo_id GROUP BY m.id ORDER BY m.orden').all() || [];
+    const modulos = db.prepare('SELECT m.nombre as nombre, m.nombre as modulo_nombre, m.orden, COUNT(rm.id) as total_respuestas, ROUND(AVG(rm.porcentaje), 2) as promedio_calificacion FROM modulos m LEFT JOIN respuestas_modulos rm ON m.id = rm.modulo_id GROUP BY m.id ORDER BY m.orden').all() || [];
     const actividad_reciente = db.prepare("SELECT DATE(u.fecha_registro) as fecha, COUNT(*) as nuevos_usuarios FROM usuarios u WHERE u.fecha_registro >= date('now', '-30 days') GROUP BY DATE(u.fecha_registro) ORDER BY fecha DESC LIMIT 30").all() || [];
     res.json({ success: true, data: { resumen, modulos, actividad_reciente } });
   } catch (error) {
@@ -427,7 +427,7 @@ app.use(function(err, req, res, next) {
 
 app.get('/api/admin/modulos/rendimiento', function(req, res) {
   try {
-    const modulos = db.prepare('SELECT m.nombre as modulo_nombre, m.orden, COUNT(rm.id) as total_respuestas, ROUND(AVG(rm.porcentaje), 2) as promedio, COUNT(CASE WHEN rm.porcentaje >= 80 THEN 1 END) as aprobados FROM modulos m LEFT JOIN respuestas_modulos rm ON m.id = rm.modulo_id GROUP BY m.id ORDER BY m.orden').all();
+    const modulos = db.prepare('SELECT m.nombre as nombre, m.nombre as modulo_nombre, m.orden, COUNT(rm.id) as total_respuestas, ROUND(AVG(rm.porcentaje), 2) as promedio, COUNT(CASE WHEN rm.porcentaje >= 80 THEN 1 END) as aprobados FROM modulos m LEFT JOIN respuestas_modulos rm ON m.id = rm.modulo_id GROUP BY m.id ORDER BY m.orden').all();
     res.json({ success: true, data: modulos });
   } catch(e) { res.status(500).json({ success: false, message: e.message }); }
 });
