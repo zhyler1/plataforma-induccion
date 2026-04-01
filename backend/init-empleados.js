@@ -22,17 +22,17 @@ async function initEmpleados() {
   
   console.log('📝 Creando usuario admin inicial...');
   
-  const cedulaHash = await bcrypt.hash('79689057', 12);
-  
+  const cedulaHash = await bcrypt.hash('00000000', 12);
+
   db.prepare(`
-    INSERT INTO usuarios (cedula, nombre, email, cedula_hash, rol) 
+    INSERT INTO usuarios (cedula, nombre, email, cedula_hash, rol)
     VALUES (?, ?, ?, ?, ?)
-  `).run('79689057', 'SERGIO LOPEZ', 'sergiolopez@presidencia.gov.co', cedulaHash, 'admin');
-  
-  const usuario = db.prepare('SELECT * FROM usuarios WHERE cedula = ?').get('79689057');
+  `).run('00000000', 'Administrador', 'admin@presidencia.gov.co', cedulaHash, 'admin');
+
+  const usuario = db.prepare('SELECT * FROM usuarios WHERE cedula = ?').get('00000000');
   db.prepare('INSERT INTO progreso_usuarios (usuario_id) VALUES (?)').run(usuario.id);
-  
-  console.log('✅ Usuario admin creado: sergiolopez@presidencia.gov.co');
+
+  console.log('Usuario admin creado: admin@presidencia.gov.co');
   db.close();
 }
 

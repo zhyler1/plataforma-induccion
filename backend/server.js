@@ -180,7 +180,7 @@ const initializeDatabase = () => {
 
 const insertDefaultUsers = () => {
   const usuarios = [
-    { nombre: 'SERGIO LOPEZ', email: 'sergio@presidencia.gov.co', cedula: '79689057' }
+    { nombre: 'Administrador', email: 'admin@presidencia.gov.co', cedula: '00000000' }
   ];
   try {
     usuarios.forEach(function(u) {
@@ -416,7 +416,7 @@ app.get('/api/certificados/verificar/:codigo', function(req, res) {
 
 // ==================== PROTECCION ADMIN ====================
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
-const ADMIN_PASS = process.env.ADMIN_PASS || 'Presidencia2025*';
+const ADMIN_PASS = process.env.ADMIN_PASS;
 
 const adminAuth = function(req, res, next) {
   const authHeader = req.headers['authorization'];
@@ -471,6 +471,47 @@ app.get('/api/admin/usuarios', adminAuth, function(req, res) {
 
 
 
+
+// ==================== DIRECTORIO ACTIVO ====================
+
+app.get('/api/me', function(req, res) {
+  // IIS con Windows Authentication pasa el usuario en este header
+  const adRaw = req.headers['logon_user'] || req.headers['x-remote-user'] || req.headers['http_logonuser'] || '';
+
+  // Sin header AD: en pruebas/desarrollo usar usuario genérico real en la BD
+  if (!adRaw) {
+    const emailPrueba = 'usuario.prueba@presidencia.gov.co';
+    let usuarioPrueba = db.prepare('SELECT id, nombre, email FROM usuarios WHERE email = ?').get(emailPrueba);
+    if (!usuarioPrueba) {
+      const r = db.prepare('INSERT INTO usuarios (nombre, email, cedula, cedula_hash) VALUES (?, ?, ?, ?)').run('Usuario Prueba', emailPrueba, '00000000', '00000000');
+      db.prepare("INSERT INTO progreso_usuarios (usuario_id, modulos_completados, total_modulos, calificacion_global, porcentaje_progreso, estado_certificacion) VALUES (?, 0, 11, 0, 0, 'En Progreso')").run(r.lastInsertRowid);
+      usuarioPrueba = db.prepare('SELECT id, nombre, email FROM usuarios WHERE id = ?').get(r.lastInsertRowid);
+    }
+    return res.json({ success: true, user: { id: usuarioPrueba.id, nombre: usuarioPrueba.nombre, email: usuarioPrueba.email } });
+  }
+
+  // PRESIDENCIA\sergiolopez → sergiolopez@presidencia.gov.co
+  const username = adRaw.includes('\\') ? adRaw.split('\\')[1].toLowerCase() : adRaw.toLowerCase();
+  const email = username + '@presidencia.gov.co';
+
+  try {
+    let usuario = db.prepare('SELECT id, nombre, email FROM usuarios WHERE email = ?').get(email);
+    if (!usuario) {
+      const result = db.prepare('INSERT INTO usuarios (nombre, email) VALUES (?, ?)').run(username, email);
+      const userId = result.lastInsertRowid;
+      db.prepare("INSERT INTO progreso_usuarios (usuario_id, modulos_completados, total_modulos, calificacion_global, porcentaje_progreso, estado_certificacion) VALUES (?, 0, 11, 0, 0, 'En Progreso')").run(userId);
+      usuario = db.prepare('SELECT id, nombre, email FROM usuarios WHERE id = ?').get(userId);
+      auditAction(req, userId, 'REGISTRO_AD', 'Usuario creado via Directorio Activo');
+    } else {
+      db.prepare('UPDATE usuarios SET ultima_actividad = CURRENT_TIMESTAMP WHERE id = ?').run(usuario.id);
+      auditAction(req, usuario.id, 'LOGIN_AD', 'Sesión iniciada via Directorio Activo');
+    }
+    return res.json({ success: true, user: { id: usuario.id, nombre: usuario.nombre, email: usuario.email } });
+  } catch (error) {
+    console.error('❌ Error en /api/me:', error.message);
+    return res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
 
 // ==================== ESTÁTICAS ====================
 

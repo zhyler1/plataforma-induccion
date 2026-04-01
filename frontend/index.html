@@ -150,11 +150,10 @@
     }
 
     .instructions::before {
-      content: '⚠️';
+      content: '';
       position: absolute;
       top: 1rem;
       left: -0.5rem;
-      font-size: 1.5rem;
       background: var(--warning-yellow);
       width: 40px;
       height: 40px;
@@ -285,8 +284,25 @@
     }
 
     .stat-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stat-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .btn-icon {
+      width: 22px;
+      height: 22px;
+      vertical-align: middle;
+      margin-right: 0.4rem;
     }
 
     .stat-number {
@@ -534,10 +550,6 @@
       transform: none;
     }
 
-    #certBtn::before {
-      content: '🏆';
-      margin-right: 0.5rem;
-    }
 
     /* Footer */
     footer {
@@ -612,7 +624,7 @@
          alt="Logo Presidencia"
          class="logo">
     <button id="logout" class="hidden">
-      <span>👤</span> Cerrar sesión
+      <img src="img/icon-usuario.png" alt="" class="btn-icon"> Cerrar sesión
     </button>
   </header>
 
@@ -632,23 +644,23 @@
   <!-- Dashboard de estadísticas -->
   <div id="statsDashboard" class="stats-dashboard hidden">
     <div class="stat-card">
-      <div class="stat-icon">📊</div>
+      <div class="stat-icon"><img src="img/icon-calificacion.png" alt="Calificación Global"></div>
       <span id="globalScore" class="stat-number">0%</span>
       <div class="stat-label">Calificación Global</div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon">✅</div>
+      <div class="stat-icon"><img src="img/icon-modulos.png" alt="Módulos Completados"></div>
       <span id="completedModules" class="stat-number">0</span>
       <div class="stat-label">Módulos Completados</div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon">⏱️</div>
+      <div class="stat-icon"><img src="img/icon-tiempo.png" alt="Tiempo Transcurrido"></div>
       <span id="timeSpent" class="stat-number">0min</span>
       <div class="stat-label">Tiempo Transcurrido</div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon">🎯</div>
-      <span id="certStatus" class="stat-number">❌</span>
+      <div class="stat-icon"><img src="img/icon-certificacion.png" alt="Certificación"></div>
+      <span id="certStatus" class="stat-number">Pendiente</span>
       <div class="stat-label">Certificación</div>
     </div>
   </div>
@@ -661,38 +673,18 @@
     </p>
   </div>
 
-  <!-- Formulario de login -->
+  <!-- Pantalla de bienvenida -->
   <section id="login" class="fade-in">
     <h2>¡Bienvenido!</h2>
-
-    <!-- Pestañas -->
-    <div class="login-tabs">
-      <button class="login-tab active" id="tabIngresar" onclick="switchLoginTab('ingresar')">Ingresar</button>
-      <button class="login-tab" id="tabRegistrarse" onclick="switchLoginTab('registrarse')">Registrarse</button>
-    </div>
-
-    <!-- Formulario Ingresar -->
-    <form id="formIngresar">
-      <input id="loginEmailIngreso" name="email" type="email" placeholder="usuario@presidencia.gov.co" required>
-      <input id="loginCedulaIngreso" name="cedula" type="text" placeholder="Número de cédula" required pattern="[0-9]+" title="Solo números">
-      <button type="submit" class="btn-login">
-        <span id="loginTextIngreso">Ingresar a la plataforma</span>
-        <span id="loginLoadingIngreso" class="loading hidden"></span>
-      </button>
-      <div id="loginErrorIngreso" style="color: red; margin-top: 1rem; display: none;"></div>
-    </form>
-
-    <!-- Formulario Registrarse -->
-    <form id="formRegistrarse" class="hidden">
-      <input id="loginNombreRegistro" name="nombre" type="text" placeholder="Nombre completo" required>
-      <input id="loginEmailRegistro" name="email" type="email" placeholder="usuario@presidencia.gov.co" required>
-      <input id="loginCedulaRegistro" name="cedula" type="text" placeholder="Número de cédula" required pattern="[0-9]+" title="Solo números">
-      <button type="submit" class="btn-login">
-        <span id="loginTextRegistro">Crear cuenta e ingresar</span>
-        <span id="loginLoadingRegistro" class="loading hidden"></span>
-      </button>
-      <div id="loginErrorRegistro" style="color: red; margin-top: 1rem; display: none;"></div>
-    </form>
+    <p style="color: var(--gray-500); margin-bottom: 2rem; font-size: 1rem;">
+      Plataforma Virtual de Inducción Institucional<br>
+      Presidencia de la República de Colombia
+    </p>
+    <button class="btn-login" id="btnIngresar">
+      <span id="btnIngresarText">Ingresar a la plataforma</span>
+      <span id="btnIngresarLoading" class="loading hidden"></span>
+    </button>
+    <div id="loginError" style="color: var(--danger-red); margin-top: 1.5rem; display: none; font-size: 0.95rem;"></div>
   </section>
 
   <!-- Contenedor de módulos -->
@@ -955,7 +947,7 @@ const completedCount = typeof userProgress.modulos_completados === 'number'
   // Actualizar elementos del DOM
   document.getElementById('globalScore').textContent = `${globalPct}%`;
   document.getElementById('completedModules').textContent = `${completedCount}/${totalModules}`;
-  document.getElementById('certStatus').textContent = globalPct >= 80 ? '✅' : '❌';
+  document.getElementById('certStatus').textContent = globalPct >= 80 ? 'Aprobado' : 'Pendiente';
 
   // Mostrar/ocultar sección de certificado
   const certDiv = document.getElementById('cert');
@@ -1165,7 +1157,7 @@ async function submitAnswers(mod, idx, container, btn, resDiv) {
       unlockNextModule(idx);
     }
 
-    btn.textContent = '✅ Completado';
+    btn.innerHTML = '<img src="img/icon-completado.png" alt="" class="btn-icon"> Completado';
     checkCompletionAndEnableCert();
 
   } catch (error) {
@@ -1312,7 +1304,7 @@ async function generateCertificate() {
     showNotification('Error al generar certificado: ' + error.message, 'error');
   } finally {
     const certBtn = document.getElementById('certBtn');
-    certBtn.textContent = '🏆 Generar Certificado';
+    certBtn.innerHTML = '<img src="img/icon-certificado.png" alt="" class="btn-icon"> Generar Certificado';
     certBtn.disabled = false;
   }
 }
@@ -1390,73 +1382,24 @@ function saveUserToSystem(userData = {}) {
 // INICIALIZACIÓN
 // ========================
 // ========================
-// SWITCH DE PESTAÑAS LOGIN
+// ENTRADA A LA PLATAFORMA (via Directorio Activo)
 // ========================
-function switchLoginTab(tab) {
-  const formIngresar = document.getElementById('formIngresar');
-  const formRegistrarse = document.getElementById('formRegistrarse');
-  const tabIngresar = document.getElementById('tabIngresar');
-  const tabRegistrarse = document.getElementById('tabRegistrarse');
-  if (tab === 'ingresar') {
-    formIngresar.classList.remove('hidden');
-    formRegistrarse.classList.add('hidden');
-    tabIngresar.classList.add('active');
-    tabRegistrarse.classList.remove('active');
-  } else {
-    formIngresar.classList.add('hidden');
-    formRegistrarse.classList.remove('hidden');
-    tabIngresar.classList.remove('active');
-    tabRegistrarse.classList.add('active');
-  }
-}
+function entrarPlatforma(userData) {
+  currentUser = { id: userData.id, nombre: userData.nombre, email: userData.email };
+  userProgress = { modulos_completados: {}, calificacion_global: 0, porcentaje_progreso: 0 };
 
-// ========================
-// FUNCIÓN COMPARTIDA DE LOGIN
-// ========================
-async function procesarLogin(email, cedula, nombre, errorEl, textEl, loadingEl) {
-  errorEl.style.display = 'none';
-  if (!email || !cedula) { showNotification('Por favor completa todos los campos', 'warning'); return; }
-  if (!/^[0-9]+$/.test(cedula)) { errorEl.textContent = 'La cédula solo debe contener números'; errorEl.style.display = 'block'; return; }
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('instructions').classList.remove('hidden');
+  document.getElementById('logout').classList.remove('hidden');
+  document.getElementById('cert').classList.remove('hidden');
+  document.getElementById('progressContainer').classList.remove('hidden');
+  document.getElementById('statsDashboard').classList.remove('hidden');
 
-  textEl.classList.add('hidden');
-  loadingEl.classList.remove('hidden');
-
-  try {
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, cedula, nombre: nombre || '' })
-    });
-    const data = await response.json();
-
-    if (data.success) {
-      currentUser = { id: data.user.id, nombre: data.user.nombre, email: data.user.email, cedula: data.user.cedula };
-      userProgress = { modulos_completados: {}, calificacion_global: 0, porcentaje_progreso: 0 };
-
-      document.getElementById('login').classList.add('hidden');
-      document.getElementById('instructions').classList.remove('hidden');
-      document.getElementById('logout').classList.remove('hidden');
-      document.getElementById('cert').classList.remove('hidden');
-      document.getElementById('progressContainer').classList.remove('hidden');
-      document.getElementById('statsDashboard').classList.remove('hidden');
-
-      renderModules();
-      startTimer();
-      updateStats();
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
-      showNotification(`¡Bienvenido ${data.user.nombre}!`, 'success');
-    } else {
-      errorEl.textContent = data.message || 'Datos incorrectos';
-      errorEl.style.display = 'block';
-    }
-  } catch (error) {
-    console.error('Error en login:', error);
-    errorEl.textContent = 'Error de conexión: ' + error.message;
-    errorEl.style.display = 'block';
-  } finally {
-    textEl.classList.remove('hidden');
-    loadingEl.classList.add('hidden');
-  }
+  renderModules();
+  startTimer();
+  updateStats();
+  localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  showNotification(`¡Bienvenido ${userData.nombre}!`, 'success');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1467,33 +1410,34 @@ document.addEventListener('DOMContentLoaded', () => {
     location.reload();
   });
 
-  // Formulario Ingresar
-  document.getElementById('formIngresar').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    await procesarLogin(
-      document.getElementById('loginEmailIngreso').value.trim(),
-      document.getElementById('loginCedulaIngreso').value.trim(),
-      '',
-      document.getElementById('loginErrorIngreso'),
-      document.getElementById('loginTextIngreso'),
-      document.getElementById('loginLoadingIngreso')
-    );
-  });
+  // Botón ingresar
+  document.getElementById('btnIngresar').addEventListener('click', async () => {
+    const errorEl = document.getElementById('loginError');
+    const textEl = document.getElementById('btnIngresarText');
+    const loadingEl = document.getElementById('btnIngresarLoading');
 
-  // Formulario Registrarse
-  document.getElementById('formRegistrarse').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const nombre = document.getElementById('loginNombreRegistro').value.trim();
-    const errorEl = document.getElementById('loginErrorRegistro');
-    if (!nombre) { errorEl.textContent = 'El nombre es requerido'; errorEl.style.display = 'block'; return; }
-    await procesarLogin(
-      document.getElementById('loginEmailRegistro').value.trim(),
-      document.getElementById('loginCedulaRegistro').value.trim(),
-      nombre,
-      errorEl,
-      document.getElementById('loginTextRegistro'),
-      document.getElementById('loginLoadingRegistro')
-    );
+    errorEl.style.display = 'none';
+    textEl.classList.add('hidden');
+    loadingEl.classList.remove('hidden');
+
+    try {
+      const response = await fetch('/api/me');
+      const data = await response.json();
+
+      if (data.success) {
+        entrarPlatforma(data.user);
+      } else {
+        errorEl.textContent = data.message || 'No se pudo identificar el usuario. Accede desde la intranet institucional.';
+        errorEl.style.display = 'block';
+      }
+    } catch (error) {
+      console.error('Error al ingresar:', error);
+      errorEl.textContent = 'Error de conexión con el servidor.';
+      errorEl.style.display = 'block';
+    } finally {
+      textEl.classList.remove('hidden');
+      loadingEl.classList.add('hidden');
+    }
   });
 });
 
@@ -1566,7 +1510,7 @@ function addDashboardLink() {
       backdrop-filter: blur(10px);
       z-index: 100;
     `;
-    dashboardLink.innerHTML = '📊 Dashboard Admin';
+    dashboardLink.innerHTML = 'Dashboard Admin';
     
     dashboardLink.addEventListener('mouseenter', () => {
       dashboardLink.style.background = 'rgba(255, 255, 255, 0.3)';
