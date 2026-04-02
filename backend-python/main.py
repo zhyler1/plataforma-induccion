@@ -43,7 +43,7 @@ app.add_middleware(
 # ==================== BASE DE DATOS ====================
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
@@ -417,7 +417,7 @@ async def crear_empleado(request: Request, conn: sqlite3.Connection = Depends(ge
 # ==================== INICIALIZACION BD ====================
 
 def init_db():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
     conn.executescript("""
