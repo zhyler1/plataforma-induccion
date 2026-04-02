@@ -34,3 +34,5 @@ temp/
 # Backups
 *.backup
 *.bak
+__pycache__/
+*.pyc
